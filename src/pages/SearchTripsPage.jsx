@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { searchJourneys } from '../api'
+import { FilterBar } from '../components/FilterBar'
 
 export function SearchTripsPage() {
   const [form, setForm] = useState({ from: '', to: '', date: '', passengers: '' })
@@ -11,6 +12,7 @@ export function SearchTripsPage() {
   const [requestError, setRequestError] = useState('')
   const [sortBy, setSortBy] = useState('')
   const [filterType, setFilterType] = useState('')
+  const [carrier, setCarrier] = useState('')
 
   function validate() {
     const errs = {}
@@ -44,6 +46,7 @@ export function SearchTripsPage() {
 
   const filtered = results
     .filter(j => !filterType || j.type === filterType)
+    .filter(j => !carrier || j.transport === carrier)
     .sort((a, b) => {
       if (sortBy === 'price') return a.price - b.price
       if (sortBy === 'duration') return a.duration.localeCompare(b.duration)
@@ -188,24 +191,7 @@ export function SearchTripsPage() {
 
           <aside className="summary-box">
             <h3>Filtres et tri</h3>
-            <div className="field">
-              <label htmlFor="sort">Trier par</label>
-              <select id="sort" value={sortBy} onChange={e => setSortBy(e.target.value)}>
-                <option value="">Par défaut</option>
-                <option value="price">Prix croissant</option>
-                <option value="departure">Heure de départ</option>
-                <option value="duration">Durée</option>
-              </select>
-            </div>
-            <div className="field">
-              <label htmlFor="type">Type de transport</label>
-              <select id="type" value={filterType} onChange={e => setFilterType(e.target.value)}>
-                <option value="">Tous</option>
-                <option value="Avion">Avion</option>
-                <option value="Bus">Bus</option>
-                <option value="Train">Train</option>
-              </select>
-            </div>
+            <FilterBar sortBy={sortBy} onSortChange={setSortBy} transport={filterType} onTransportChange={setFilterType} carrier={carrier} onCarrierChange={setCarrier} carriers={[...new Set(results.map(journey => journey.transport))]} />
           </aside>
         </div>
       )}

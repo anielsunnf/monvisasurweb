@@ -1,17 +1,26 @@
 import { useEffect, useState } from 'react'
 import { NavLink, useParams } from 'react-router-dom'
-import { getDossier } from '../../api'
+import { getDossier, respondToDossierRequest } from '../../api'
 import { StatusBadge } from '../../components/StatusBadge'
 import { EmptyState } from '../../components/EmptyState'
+import { Timeline } from '../../components/Timeline'
 
 export function DossierDetailPage({ user }) {
 	const { id } = useParams()
 	const [dossier, setDossier] = useState(null)
 	const [loading, setLoading] = useState(true)
+	const [response, setResponse] = useState('')
+	const [responseSent, setResponseSent] = useState(false)
 
 	useEffect(() => {
 		getDossier(id, user.id).then(setDossier).finally(() => setLoading(false))
 	}, [id, user.id])
+
+	async function handleResponse() {
+		if (!response.trim()) return
+		await respondToDossierRequest(id, response)
+		setResponseSent(true)
+	}
 
 	if (loading) {
 		return <main className="container page"><div className="loading-state"><p>Chargement du dossier...</p></div></main>
@@ -43,6 +52,11 @@ export function DossierDetailPage({ user }) {
 					<div className="field full"><label>Pièces transmises</label><input value={(dossier.documents || []).join(', ')} readOnly /></div>
 				</div>
 			</section>
+			<aside className="summary-box">
+				<h2>Historique</h2>
+				<Timeline entries={dossier.history} />
+				{dossier.additionalRequest && <div className="field"><label htmlFor="client-response">Répondre à la demande de pièce</label><textarea id="client-response" rows="4" value={response} onChange={event => setResponse(event.target.value)} placeholder="Indiquez la pièce ou l'information transmise" />{responseSent && <span className="field-error">Réponse enregistrée.</span>}<button type="button" className="btn btn-primary" onClick={handleResponse}>Envoyer la réponse</button></div>}
+			</aside>
 		</main>
 	)
 }

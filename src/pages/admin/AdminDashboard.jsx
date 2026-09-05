@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { getAllDossiers, updateDossierStatus } from '../../api'
+import { getAllDossiers, requestDossierDocument, updateDossierStatus } from '../../api'
 import { StatusBadge } from '../../components/StatusBadge'
 import { EmptyState } from '../../components/EmptyState'
+import { NavLink } from 'react-router-dom'
 
 const statusOptions = [
   { value: 'en_cours', label: 'En cours' },
@@ -17,6 +18,7 @@ export function AdminDashboard() {
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [documentRequest, setDocumentRequest] = useState('')
 
   useEffect(() => {
     getAllDossiers().then(setDossiers).catch(() => setError('Impossible de charger les dossiers.')).finally(() => setLoading(false))
@@ -26,6 +28,13 @@ export function AdminDashboard() {
     if (!selectedId || !status) return
     await updateDossierStatus(selectedId, status)
     setDossiers(current => current.map(dossier => dossier.id === selectedId ? { ...dossier, status } : dossier))
+  }
+
+  async function handleDocumentRequest() {
+    if (!selectedId || !documentRequest.trim()) return
+    await requestDossierDocument(selectedId, documentRequest)
+    setDossiers(current => current.map(dossier => dossier.id === selectedId ? { ...dossier, additionalRequest: documentRequest } : dossier))
+    setDocumentRequest('')
   }
 
   const counts = {
@@ -38,6 +47,7 @@ export function AdminDashboard() {
   return (
     <main className="container page">
       <div className="section-header"><div><span className="eyebrow">Back-office</span><h1 className="section-title">Administration</h1></div></div>
+      <div className="card-actions"><NavLink to="/admin/catalogue" className="btn btn-secondary">Gérer le catalogue</NavLink><NavLink to="/admin/trajets" className="btn btn-secondary">Gérer les trajets</NavLink></div>
       <div className="grid-3" style={{ marginBottom: '1rem' }}>
         <div className="metric"><strong>{counts.total}</strong><span>Total dossiers</span></div>
         <div className="metric"><strong>{counts.current}</strong><span>Dossiers en cours</span></div>
@@ -73,6 +83,7 @@ export function AdminDashboard() {
                 <p><strong>Motif :</strong> {selectedDossier.motif || 'Non renseigné'}</p>
                 <p><strong>Pièces :</strong> {(selectedDossier.documents || []).join(', ') || 'Aucune'}</p>
               </div>}
+              <div className="field"><label htmlFor="document-request">Demander une pièce complémentaire</label><textarea id="document-request" rows="3" value={documentRequest} onChange={event => setDocumentRequest(event.target.value)} placeholder="Ex : justificatif de domicile récent" /><button type="button" className="btn btn-secondary" onClick={handleDocumentRequest}>Envoyer la demande</button></div>
               <div className="field"><label htmlFor="admin-status">Nouveau statut</label><select id="admin-status" value={status} onChange={event => setStatus(event.target.value)}><option value="">Sélectionner</option>{statusOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></div>
               <button type="button" className="btn btn-primary" onClick={handleUpdate}>Mettre à jour</button>
             </>

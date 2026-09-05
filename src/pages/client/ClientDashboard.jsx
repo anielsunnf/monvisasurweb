@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { getDossiers, getOrders } from '../../api'
+import { cancelAppointment, cancelOrder, getAppointments, getDossiers, getOrders } from '../../api'
 import { StatusBadge } from '../../components/StatusBadge'
 import { EmptyState } from '../../components/EmptyState'
 
@@ -9,13 +9,30 @@ export function ClientDashboard({ user }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [orders, setOrders] = useState([])
+  const [appointments, setAppointments] = useState([])
+  const [orderError, setOrderError] = useState('')
 
   useEffect(() => {
-    Promise.all([getDossiers(user.id), getOrders(user.id)])
-      .then(([nextDossiers, nextOrders]) => { setDossiers(nextDossiers); setOrders(nextOrders) })
+    Promise.all([getDossiers(user.id), getOrders(user.id), getAppointments(user.id)])
+      .then(([nextDossiers, nextOrders, nextAppointments]) => { setDossiers(nextDossiers); setOrders(nextOrders); setAppointments(nextAppointments) })
       .catch(() => setError('Impossible de charger vos données client.'))
       .finally(() => setLoading(false))
   }, [user.id])
+
+  async function handleCancel(orderId) {
+    setOrderError('')
+    try {
+      await cancelOrder(orderId, user.id)
+      setOrders(current => current.map(order => order.id === orderId ? { ...order, status: 'annulée' } : order))
+    } catch (error) {
+      setOrderError(error.message)
+    }
+  }
+
+  async function handleCancelAppointment(appointmentId) {
+    await cancelAppointment(appointmentId, user.id)
+    setAppointments(current => current.map(appointment => appointment.id === appointmentId ? { ...appointment, status: 'annulé' } : appointment))
+  }
 
   return (
     <main className="container page">
@@ -67,11 +84,17 @@ export function ClientDashboard({ user }) {
                   <strong>{order.route}</strong>
                   <div className="meta-line"><span>{order.id}</span><span>{order.date}</span></div>
                   <div className="meta-line"><span>{order.passengers.length} passager{order.passengers.length > 1 ? 's' : ''}</span><strong>{order.total.toLocaleString()} {order.currency}</strong></div>
-                  <StatusBadge status="confirmed" />
+                  <StatusBadge status={order.status === 'annulée' ? 'cancelled' : 'confirmed'} />
+                  <div className="card-actions"><NavLink to={`/billet/${order.reference}`} className="btn btn-ghost">Voir le billet</NavLink>{order.status !== 'annulée' && <button type="button" className="btn btn-ghost" onClick={() => handleCancel(order.id)}>Annuler</button>}</div>
                 </article>
               ))}
             </div>
           )}
+          {orderError && <p className="field-error" role="alert">{orderError}</p>}
+          <h3 style={{ marginTop: '1.5rem' }}>Mes rendez-vous</h3>
+          {appointments.length === 0 ? <p className="small-muted">Aucun rendez-vous planifié.</p> : appointments.map(appointment => <div className="appointment-row" key={appointment.id}><p className="small-muted">{appointment.date} à {appointment.slot} : {appointment.reason}<br /><StatusBadge status={appointment.status === 'annulé' ? 'cancelled' : 'confirmed'} /></p>{appointment.status !== 'annulé' && <button type="button" className="btn btn-ghost" onClick={() => handleCancelAppointment(appointment.id)}>Annuler</button>}</div>)}
+          <NavLink to="/rendez-vous" className="btn btn-secondary">Prendre rendez-vous</NavLink>
+          <NavLink to="/client/notifications" className="btn btn-secondary">Voir mes notifications</NavLink>
           <h3 style={{ marginTop: '1.5rem' }}>Accès rapide</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <NavLink to="/catalogue" className="btn btn-secondary">Catalogue des prestations</NavLink>

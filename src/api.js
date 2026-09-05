@@ -4,27 +4,32 @@ import { journeys } from './data/journeys'
 let dossierStore = []
 let userStore = []
 let orderStore = []
+let appointmentStore = []
+let notificationStore = []
+let catalogueStore = [...services]
+let journeyStore = [...journeys]
 
 export function getServices() {
-  return Promise.resolve(services)
+  return Promise.resolve(catalogueStore)
 }
 
 export function getServiceById(id) {
-  return Promise.resolve(services.find(service => service.id === id) ?? null)
+  return Promise.resolve(catalogueStore.find(service => service.id === id) ?? null)
 }
 
 export function getJourneyById(id) {
-  return Promise.resolve(journeys.find(journey => journey.id === id) ?? null)
+  return Promise.resolve(journeyStore.find(journey => journey.id === id) ?? null)
 }
 
 export function searchJourneys(criteria) {
   const from = criteria.from.trim().toLowerCase()
   const to = criteria.to.trim().toLowerCase()
 
-  return Promise.resolve(journeys.filter(journey => (
+  return Promise.resolve(journeyStore.filter(journey => (
     journey.from.toLowerCase().includes(from)
     && journey.to.toLowerCase().includes(to)
     && journey.date === criteria.date
+    && (!criteria.transport || journey.transport === criteria.transport)
   )))
 }
 
@@ -46,13 +51,43 @@ export function createDossier(dossier) {
     id: `DOS-${Date.now()}`,
     date: new Date().toLocaleDateString('fr-FR'),
     status: 'en_cours',
+    history: [{ label: 'Demande créée', date: new Date().toLocaleDateString('fr-FR'), description: 'Dossier ouvert par le client.' }],
+    additionalRequest: '',
+    clientResponse: '',
   }
   dossierStore = [...dossierStore, created]
+  addNotification({ userId: dossier.userId, title: 'Dossier créé', message: `Votre dossier ${created.id} a été enregistré.` })
   return Promise.resolve(created)
 }
 
 export function updateDossierStatus(id, status) {
-  dossierStore = dossierStore.map(dossier => dossier.id === id ? { ...dossier, status } : dossier)
+  const target = dossierStore.find(dossier => dossier.id === id)
+  dossierStore = dossierStore.map(dossier => dossier.id === id ? {
+    ...dossier,
+    status,
+    history: [...(dossier.history || []), { label: `Statut : ${status}`, date: new Date().toLocaleDateString('fr-FR'), description: 'Statut mis à jour par le conseiller.' }],
+  } : dossier)
+  if (target) addNotification({ userId: target.userId, title: 'Statut mis à jour', message: `Le dossier ${id} est maintenant : ${status}.` })
+  return Promise.resolve()
+}
+
+export function requestDossierDocument(id, request) {
+  const target = dossierStore.find(dossier => dossier.id === id)
+  dossierStore = dossierStore.map(dossier => dossier.id === id ? {
+    ...dossier,
+    additionalRequest: request,
+    history: [...(dossier.history || []), { label: 'Pièce complémentaire demandée', date: new Date().toLocaleDateString('fr-FR'), description: request }],
+  } : dossier)
+  if (target) addNotification({ userId: target.userId, title: 'Pièce complémentaire demandée', message: request })
+  return Promise.resolve()
+}
+
+export function respondToDossierRequest(id, response) {
+  dossierStore = dossierStore.map(dossier => dossier.id === id ? {
+    ...dossier,
+    clientResponse: response,
+    history: [...(dossier.history || []), { label: 'Réponse du client', date: new Date().toLocaleDateString('fr-FR'), description: response }],
+  } : dossier)
   return Promise.resolve()
 }
 
@@ -78,11 +113,74 @@ export function createOrder(order) {
     id: `CMD-${Date.now()}`,
     status: 'confirmée',
     date: new Date().toLocaleDateString('fr-FR'),
+    reference: `MON-${Date.now().toString().slice(-8)}`,
+    cancelledAt: '',
   }
   orderStore = [...orderStore, created]
+  addNotification({ userId: order.userId, title: 'Réservation confirmée', message: `Commande ${created.reference} confirmée.` })
   return Promise.resolve(created)
 }
 
 export function getOrders(userId) {
   return Promise.resolve(orderStore.filter(order => order.userId === userId))
+}
+
+export function cancelOrder(id, userId) {
+  const order = orderStore.find(candidate => candidate.id === id && candidate.userId === userId)
+  if (!order) return Promise.reject(new Error('Commande introuvable.'))
+  const daysUntilDeparture = Math.ceil((new Date(`${order.journey.date}T${order.journey.departure}`) - new Date()) / 86400000)
+  if (daysUntilDeparture < 2) return Promise.reject(new Error('Annulation possible jusqu’à 48 heures avant le départ.'))
+  orderStore = orderStore.map(candidate => candidate.id === id ? { ...candidate, status: 'annulée', cancelledAt: new Date().toLocaleDateString('fr-FR') } : candidate)
+  addNotification({ userId, title: 'Commande annulée', message: `La commande ${order.reference} a été annulée.` })
+  return Promise.resolve()
+}
+
+export function createAppointment(appointment) {
+  const created = { ...appointment, id: `RDV-${Date.now()}`, status: 'confirmé' }
+  appointmentStore = [...appointmentStore, created]
+  addNotification({ userId: appointment.userId, title: 'Rendez-vous confirmé', message: `Rendez-vous le ${appointment.date} à ${appointment.slot}.` })
+  return Promise.resolve(created)
+}
+
+export function cancelAppointment(id, userId) {
+  const appointment = appointmentStore.find(item => item.id === id && item.userId === userId)
+  if (!appointment) return Promise.reject(new Error('Rendez-vous introuvable.'))
+  appointmentStore = appointmentStore.map(item => item.id === id ? { ...item, status: 'annulé' } : item)
+  addNotification({ userId, title: 'Rendez-vous annulé', message: `Le rendez-vous du ${appointment.date} à ${appointment.slot} a été annulé.` })
+  return Promise.resolve()
+}
+
+export function getAppointments(userId) {
+  return Promise.resolve(appointmentStore.filter(appointment => appointment.userId === userId))
+}
+
+export function getAvailableSlots() {
+  return Promise.resolve(['09:00', '10:30', '14:00', '15:30'])
+}
+
+export function getNotifications(userId) {
+  return Promise.resolve(notificationStore.filter(notification => notification.userId === userId))
+}
+
+export function addNotification(notification) {
+  notificationStore = [...notificationStore, { ...notification, id: `NOT-${Date.now()}`, channel: 'email-simulé', read: false }]
+  return Promise.resolve()
+}
+
+export function updateService(id, changes) {
+  catalogueStore = catalogueStore.map(service => service.id === id ? { ...service, ...changes } : service)
+  return Promise.resolve()
+}
+
+export function updateJourney(id, changes) {
+  journeyStore = journeyStore.map(journey => journey.id === id ? { ...journey, ...changes } : journey)
+  return Promise.resolve()
+}
+
+export function getAllServices() {
+  return Promise.resolve(catalogueStore)
+}
+
+export function getAllJourneys() {
+  return Promise.resolve(journeyStore)
 }
