@@ -3,7 +3,7 @@ export const journeys = [
     id: 'TRJ-001',
     from: 'Yaoundé',
     to: 'Douala',
-    date: '2026-09-15',
+    date: '2026-09-14',
     departure: '07:30',
     arrival: '10:00',
     duration: '2h30',

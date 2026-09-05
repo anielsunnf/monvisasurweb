@@ -9,6 +9,11 @@ let notificationStore = []
 let catalogueStore = [...services]
 let journeyStore = [...journeys]
 
+function normalizeCity(value) {
+  const normalized = value.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  return normalized === 'younde' ? 'yaounde' : normalized
+}
+
 export function getServices() {
   return Promise.resolve(catalogueStore)
 }
@@ -22,12 +27,12 @@ export function getJourneyById(id) {
 }
 
 export function searchJourneys(criteria) {
-  const from = criteria.from.trim().toLowerCase()
-  const to = criteria.to.trim().toLowerCase()
+  const from = normalizeCity(criteria.from)
+  const to = normalizeCity(criteria.to)
 
   return Promise.resolve(journeyStore.filter(journey => (
-    journey.from.toLowerCase().includes(from)
-    && journey.to.toLowerCase().includes(to)
+    normalizeCity(journey.from).includes(from)
+    && normalizeCity(journey.to).includes(to)
     && journey.date === criteria.date
     && (!criteria.transport || journey.transport === criteria.transport)
   )))
