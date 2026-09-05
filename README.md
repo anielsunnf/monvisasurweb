@@ -1,16 +1,54 @@
 # Monvisasur
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Application front-end React/Vite de gestion de démarches administratives, de trajets et de réservations.
 
-Currently, two official plugins are available:
+## Prérequis
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js 20 ou plus récent
+- npm
 
-## React Compiler
+## Installation
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Depuis le dossier `afri-link-front` :
 
-## Expanding the Oxlint configuration
+```powershell
+npm install
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Puis ouvrir l'URL affichée par Vite, généralement `http://localhost:5173/`.
+
+## Commandes
+
+```powershell
+npm run dev     # serveur de développement
+npm run build   # compilation de production
+npm run lint    # contrôle Oxlint
+npm run preview # aperçu de la compilation
+```
+
+## Fonctionnalités du niveau 1
+
+- accueil public, catalogue et fiches détaillées des prestations ;
+- inscription et connexion locale avec profils client, conseiller et administrateur ;
+- ouverture d'un dossier avec validation et téléversement d'une pièce ;
+- espace client avec dossiers, statuts et commandes ;
+- recherche de trajets et réservation simulée avec récapitulatif ;
+- back-office avec consultation et modification des statuts ;
+- routes protégées selon l'authentification et le profil.
+
+## Architecture
+
+- `src/pages` : écrans publics, authentification, réservation et espace client ;
+- `src/components` : composants partagés ;
+- `src/data` : jeu de données statique des services et trajets ;
+- `src/api.js` : façade unique des appels de données locaux ;
+- `src/api/index.js` : ancien point d'entrée conservé pour compatibilité ; les écrans utilisent `src/api.js`.
+
+Les composants utilisent des états de chargement, succès, erreur et liste vide lorsque des données sont chargées.
+
+## Limites connues
+
+Le projet utilise actuellement une API locale en mémoire. Les comptes, dossiers et commandes sont perdus au rechargement de la page. Les fonctions de `src/api.js` sont isolées pour permettre un remplacement ultérieur par des appels HTTP sans modifier les écrans.
+
+Les comptes de démonstration ne sont pas préremplis : il faut créer un compte depuis l'écran d'inscription avant de se connecter.
