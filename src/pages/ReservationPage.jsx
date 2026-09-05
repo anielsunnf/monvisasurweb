@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
-import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { NavLink, useParams, useSearchParams } from 'react-router-dom'
 import { createOrder, getJourneyById } from '../api'
 
 export function ReservationPage({ user }) {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
   const passengerCount = Number(searchParams.get('passengers'))
   const [journey, setJourney] = useState(null)
   const [passengerNames, setPassengerNames] = useState('')
