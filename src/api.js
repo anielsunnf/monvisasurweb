@@ -2,7 +2,8 @@ import { services } from './data/services'
 import { journeys } from './data/journeys'
 
 let dossierStore = []
-let userStore = []
+const USER_STORAGE_KEY = 'monvisasur.users'
+let userStore = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || '[]')
 let orderStore = []
 let appointmentStore = []
 let notificationStore = []
@@ -97,16 +98,19 @@ export function respondToDossierRequest(id, response) {
 }
 
 export function registerUser({ email, password, role, name }) {
-  const existing = userStore.find(user => user.email === email)
+  const normalizedEmail = email.trim().toLowerCase()
+  const existing = userStore.find(user => user.email === normalizedEmail)
   if (existing) return Promise.reject(new Error('Cette adresse email est déjà utilisée.'))
 
-  const user = { id: `USR-${Date.now()}`, email, password, role, name }
+  const user = { id: `USR-${Date.now()}`, email: normalizedEmail, password, role, name: name.trim() }
   userStore = [...userStore, user]
+  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userStore))
   return Promise.resolve({ id: user.id, email: user.email, role: user.role, name: user.name })
 }
 
 export function loginUser({ email, password, role }) {
-  const user = userStore.find(candidate => candidate.email === email && candidate.password === password && candidate.role === role)
+  const normalizedEmail = email.trim().toLowerCase()
+  const user = userStore.find(candidate => candidate.email === normalizedEmail && candidate.password === password && candidate.role === role)
   return user
     ? Promise.resolve({ id: user.id, email: user.email, role: user.role, name: user.name })
     : Promise.reject(new Error('Email, mot de passe ou profil incorrect.'))
