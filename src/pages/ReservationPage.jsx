@@ -7,7 +7,8 @@ export function ReservationPage({ user }) {
   const [searchParams] = useSearchParams()
   const passengerCount = Number(searchParams.get('passengers'))
   const [journey, setJourney] = useState(null)
-  const [passengerNames, setPassengerNames] = useState('')
+  const [passengers, setPassengers] = useState(() => Array.from({ length: passengerCount > 0 ? passengerCount : 0 }, () => ({ name: '', document: null })))
+  const [payment, setPayment] = useState({ method: '', reference: '' })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -21,8 +22,12 @@ export function ReservationPage({ user }) {
     const nextErrors = {}
     if (!journey) nextErrors.journey = 'Le trajet sélectionné est introuvable.'
     if (!Number.isInteger(passengerCount) || passengerCount < 1) nextErrors.passengers = 'Le nombre de passagers est invalide.'
-    const names = passengerNames.split('\n').map(name => name.trim()).filter(Boolean)
-    if (names.length !== passengerCount) nextErrors.passengerNames = `Saisissez exactement ${passengerCount} nom${passengerCount > 1 ? 's' : ''}, un par ligne.`
+    passengers.forEach((passenger, index) => {
+      if (!passenger.name.trim()) nextErrors[`passenger-${index}`] = `Le nom du passager ${index + 1} est requis.`
+      if (!passenger.document) nextErrors[`document-${index}`] = `Le document d'identité du passager ${index + 1} est requis.`
+    })
+    if (!payment.method) nextErrors.paymentMethod = 'Choisissez un moyen de paiement simulé.'
+    if (!payment.reference.trim()) nextErrors.paymentReference = 'Saisissez une référence de paiement simulée.'
     return nextErrors
   }
 
@@ -39,10 +44,12 @@ export function ReservationPage({ user }) {
         userId: user.id,
         journeyId: journey.id,
         route: `${journey.from} → ${journey.to}`,
-        passengers: passengerNames.split('\n').map(name => name.trim()).filter(Boolean),
+        passengers: passengers.map(passenger => ({ name: passenger.name.trim(), document: passenger.document.name })),
         total: journey.price * passengerCount,
         currency: journey.currency,
         journey,
+        selectedDate: searchParams.get('date') || journey.date,
+        paymentStatus: 'paiement simulé confirmé',
       })
       setConfirmed(true)
     } finally {
@@ -61,17 +68,15 @@ export function ReservationPage({ user }) {
         <section className="panel">
           <h2>Passagers</h2>
           <p className="small-muted">Saisissez un nom complet par ligne pour les {passengerCount} passager{passengerCount > 1 ? 's' : ''} sélectionné{passengerCount > 1 ? 's' : ''}.</p>
-          <div className="field">
-            <label htmlFor="passenger-names">Noms des passagers *</label>
-            <textarea id="passenger-names" rows="6" value={passengerNames} onChange={event => setPassengerNames(event.target.value)} aria-invalid={Boolean(errors.passengerNames)} placeholder="Nom complet du passager 1\nNom complet du passager 2" />
-            {errors.passengerNames && <span className="field-error">{errors.passengerNames}</span>}
-          </div>
+          {passengers.map((passenger, index) => <div className="passenger-form" key={index}><h3>Passager {index + 1}</h3><div className="form-grid"><div className="field"><label htmlFor={`passenger-name-${index}`}>Nom complet *</label><input id={`passenger-name-${index}`} value={passenger.name} onChange={event => setPassengers(current => current.map((item, itemIndex) => itemIndex === index ? { ...item, name: event.target.value } : item))} aria-invalid={Boolean(errors[`passenger-${index}`])} />{errors[`passenger-${index}`] && <span className="field-error">{errors[`passenger-${index}`]}</span>}</div><div className="field"><label htmlFor={`passenger-document-${index}`}>Document d'identité *</label><input id={`passenger-document-${index}`} type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={event => setPassengers(current => current.map((item, itemIndex) => itemIndex === index ? { ...item, document: event.target.files?.[0] || null } : item))} />{errors[`document-${index}`] && <span className="field-error">{errors[`document-${index}`]}</span>}</div></div></div>)}
+          <div className="field"><label htmlFor="payment-method">Paiement simulé *</label><select id="payment-method" value={payment.method} onChange={event => setPayment(current => ({ ...current, method: event.target.value }))}><option value="">Choisir un moyen</option><option value="mobile-money">Mobile Money simulé</option><option value="card">Carte simulée</option><option value="bank">Virement simulé</option></select>{errors.paymentMethod && <span className="field-error">{errors.paymentMethod}</span>}</div>
+          <div className="field"><label htmlFor="payment-reference">Référence de paiement *</label><input id="payment-reference" value={payment.reference} onChange={event => setPayment(current => ({ ...current, reference: event.target.value }))} placeholder="Référence fournie par la simulation" />{errors.paymentReference && <span className="field-error">{errors.paymentReference}</span>}</div>
           <button type="button" className="btn btn-primary" onClick={handleConfirm} disabled={submitting}>{submitting ? 'Confirmation...' : 'Confirmer la réservation'}</button>
         </section>
         <aside className="summary-box">
           <h2>Récapitulatif</h2>
           <p><strong>{journey.from} → {journey.to}</strong></p>
-          <p className="small-muted">{journey.date} · {journey.departure} - {journey.arrival}</p>
+          <p className="small-muted">{searchParams.get('date') || journey.date} · {journey.departure} - {journey.arrival}</p>
           <p className="small-muted">{journey.transport} · {journey.duration}</p>
           <div className="meta-line"><span>{passengerCount} passager{passengerCount > 1 ? 's' : ''}</span><strong>{(journey.price * passengerCount).toLocaleString()} {journey.currency}</strong></div>
         </aside>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
+import { translations } from './data/translations'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { HomePage } from './pages/HomePage'
 import { CataloguePage } from './pages/CataloguePage'
@@ -22,10 +23,22 @@ import './App.css'
 
 function App() {
   const [user, setUser] = useState(null)
+  const [language, setLanguage] = useState(localStorage.getItem('monvisasur.language') || 'fr')
+  const [theme, setTheme] = useState(localStorage.getItem('monvisasur.theme') || 'dark')
+
+  function changeLanguage(nextLanguage) {
+    setLanguage(nextLanguage)
+    localStorage.setItem('monvisasur.language', nextLanguage)
+  }
+
+  function changeTheme(nextTheme) {
+    setTheme(nextTheme)
+    localStorage.setItem('monvisasur.theme', nextTheme)
+  }
 
   return (
-    <div className="app-shell">
-      <Header user={user} onLogout={() => setUser(null)} />
+    <div className={`app-shell theme-${theme}`}>
+      <Header user={user} onLogout={() => setUser(null)} language={language} onLanguageChange={changeLanguage} theme={theme} onThemeChange={changeTheme} labels={translations[language]} />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/catalogue" element={<CataloguePage />} />

@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
+import { LanguageSelector } from './LanguageSelector'
 
-export function Header({ user, onLogout }) {
+export function Header({ user, onLogout, language, onLanguageChange, theme, onThemeChange, labels }) {
   return (
     <header className="header">
       <div className="container topbar">
@@ -11,38 +12,40 @@ export function Header({ user, onLogout }) {
 
         <nav className="main-nav" aria-label="Navigation principale">
           <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            Accueil
+            {labels.home}
           </NavLink>
           <NavLink to="/catalogue" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            Catalogue
+            {labels.catalogue}
           </NavLink>
           <NavLink to="/trajets" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            Réserver un billet
+            {labels.travel}
           </NavLink>
           {user && (
             <NavLink to="/client" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              Espace client
+              {labels.client}
             </NavLink>
           )}
           {user?.role === 'admin' && (
             <NavLink to="/admin" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              Back-office
+              {labels.admin}
             </NavLink>
           )}
         </nav>
 
         <div className="header-actions">
+          <button type="button" className="theme-toggle" onClick={() => onThemeChange(theme === 'dark' ? 'light' : 'dark')} aria-label={theme === 'dark' ? labels.light : labels.dark}>{theme === 'dark' ? '☼' : '◐'}</button>
+          <LanguageSelector language={language} onLanguageChange={onLanguageChange} />
           {user ? (
             <>
               <span className="user-name">{user.name}</span>
               <span className="role-badge">{user.role}</span>
               <button type="button" className="btn btn-ghost" onClick={onLogout}>
-                Déconnexion
+                {labels.logout}
               </button>
             </>
           ) : (
             <NavLink to="/login" className="btn btn-secondary">
-              Connexion
+              {labels.login}
             </NavLink>
           )}
         </div>

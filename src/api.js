@@ -34,8 +34,9 @@ export function searchJourneys(criteria) {
   return Promise.resolve(journeyStore.filter(journey => (
     normalizeCity(journey.from).includes(from)
     && normalizeCity(journey.to).includes(to)
-    && journey.date === criteria.date
-    && (!criteria.transport || journey.transport === criteria.transport)
+    && criteria.date >= (journey.availableFrom || journey.date)
+    && criteria.date <= (journey.availableTo || journey.date)
+    && (!criteria.transport || journey.type === criteria.transport)
   )))
 }
 
@@ -97,6 +98,18 @@ export function respondToDossierRequest(id, response) {
   return Promise.resolve()
 }
 
+export function addDossierDocument(id, userId, document) {
+  const target = dossierStore.find(dossier => dossier.id === id && dossier.userId === userId)
+  if (!target) return Promise.reject(new Error('Dossier introuvable.'))
+  dossierStore = dossierStore.map(dossier => dossier.id === id ? {
+    ...dossier,
+    documents: [...(dossier.documents || []), document.name],
+    history: [...(dossier.history || []), { label: 'Pièce complémentaire transmise', date: new Date().toLocaleDateString('fr-FR'), description: document.name }],
+  } : dossier)
+  addNotification({ userId, title: 'Pièce complémentaire transmise', message: document.name })
+  return Promise.resolve()
+}
+
 export function registerUser({ email, password, role, name }) {
   const normalizedEmail = email.trim().toLowerCase()
   const existing = userStore.find(user => user.email === normalizedEmail)
@@ -121,6 +134,7 @@ export function createOrder(order) {
     ...order,
     id: `CMD-${Date.now()}`,
     status: 'confirmée',
+    paymentStatus: order.paymentStatus || 'paiement simulé confirmé',
     date: new Date().toLocaleDateString('fr-FR'),
     reference: `MON-${Date.now().toString().slice(-8)}`,
     cancelledAt: '',
@@ -192,4 +206,21 @@ export function getAllServices() {
 
 export function getAllJourneys() {
   return Promise.resolve(journeyStore)
+}
+
+export function replaceDossierDocument(id, userId, index, document) {
+  const target = dossierStore.find(dossier => dossier.id === id && dossier.userId === userId)
+  if (!target) return Promise.reject(new Error('Dossier introuvable.'))
+  dossierStore = dossierStore.map(dossier => {
+    if (dossier.id !== id) return dossier
+    const documents = [...(dossier.documents || [])]
+    documents[index] = document.name
+    return {
+      ...dossier,
+      documents,
+      history: [...(dossier.history || []), { label: 'Pièce remplacée', date: new Date().toLocaleDateString('fr-FR'), description: document.name }],
+    }
+  })
+  addNotification({ userId, title: 'Pièce remplacée', message: document.name })
+  return Promise.resolve()
 }

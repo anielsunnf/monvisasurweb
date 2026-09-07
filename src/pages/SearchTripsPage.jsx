@@ -180,7 +180,7 @@ export function SearchTripsPage() {
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div className="price">{journey.price.toLocaleString()} {journey.currency}</div>
-                    <NavLink to={`/reservation/${journey.id}?passengers=${form.passengers}`} className="btn btn-primary" style={{ marginTop: '0.5rem' }}>
+                    <NavLink to={`/reservation/${journey.id}?passengers=${form.passengers}&date=${form.date}`} className="btn btn-primary" style={{ marginTop: '0.5rem' }}>
                       Choisir
                     </NavLink>
                   </div>
