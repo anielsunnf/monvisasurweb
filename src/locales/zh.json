@@ -1,0 +1,7 @@
+{
+  "nav": { "home": "首页", "catalogue": "服务目录", "book": "预订车票", "client": "客户中心", "backoffice": "后台管理", "login": "登录", "logout": "退出" },
+  "home": { "eyebrow": "国际出行", "title": "从抵达到出发，流程更简单。", "lead": "Monvisasur 将行政申请和交通预订集中在一个空间。", "cta_catalogue": "查看目录", "cta_search": "搜索行程", "section_services": "热门服务", "see_all": "查看全部 →", "how_title": "使用流程", "step1_title": "选择服务", "step1_desc": "浏览目录并选择所需服务。", "step2_title": "创建档案", "step2_desc": "填写表格并上传文件。", "step3_title": "实时跟踪", "step3_desc": "顾问会通知每个步骤。", "cta_final_title": "准备开始了吗？", "cta_final_desc": "创建账户并在一个地方管理出行。", "cta_final_btn": "创建账户" },
+  "search": { "eyebrow": "交通", "title": "搜索行程", "from": "出发城市", "to": "到达城市", "date": "出发日期", "passengers": "乘客", "search_btn": "搜索", "searching": "搜索中...", "no_results": "未找到行程。", "try_again": "请尝试其他日期或城市。", "filters": "筛选和排序" },
+  "login": { "title": "一个账户管理您的出行。", "heading": "登录", "email": "电子邮箱", "password": "密码", "profile": "个人资料", "submit": "登录", "register": "注册" },
+  "common": { "language": "语言", "light": "浅色模式", "dark": "深色模式", "loading": "加载中...", "retry": "重试" }
+}

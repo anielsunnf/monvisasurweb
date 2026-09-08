@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { loginUser, registerUser } from '../api'
+import { useI18n } from '../components/useI18n'
 
 export function LoginPage({ setUser }) {
+	const { t } = useI18n()
 	const navigate = useNavigate()
 	const [mode, setMode] = useState('login')
 	const [form, setForm] = useState({ name: '', email: '', password: '', role: '' })
@@ -51,10 +53,10 @@ export function LoginPage({ setUser }) {
 
 				<section className="panel">
 					<div className="tab-row" aria-label="Mode d'accès">
-						<button type="button" className={`tab ${mode === 'login' ? 'active' : ''}`} onClick={() => { setMode('login'); setErrors({}); setSubmitError('') }}>Connexion</button>
-						<button type="button" className={`tab ${mode === 'register' ? 'active' : ''}`} onClick={() => { setMode('register'); setErrors({}); setSubmitError('') }}>Inscription</button>
+						<button type="button" className={`tab ${mode === 'login' ? 'active' : ''}`} onClick={() => { setMode('login'); setErrors({}); setSubmitError('') }}>{t('login')}</button>
+						<button type="button" className={`tab ${mode === 'register' ? 'active' : ''}`} onClick={() => { setMode('register'); setErrors({}); setSubmitError('') }}>{t('register')}</button>
 					</div>
-					<h2>{mode === 'login' ? 'Connexion' : 'Créer un compte'}</h2>
+					<h2>{mode === 'login' ? t('login') : t('create')}</h2>
 					{submitError && <div className="alert alert-error" role="alert">{submitError}</div>}
 					<div className="form-grid">
 						{mode === 'register' && <div className="field full">
@@ -63,22 +65,26 @@ export function LoginPage({ setUser }) {
 							{errors.name && <span className="field-error">{errors.name}</span>}
 						</div>}
 						<div className="field full">
-							<label htmlFor="email">Adresse email *</label>
+							<label htmlFor="email">{t('email')} *</label>
 							<input id="email" type="email" aria-invalid={Boolean(errors.email)} placeholder="votre.email@exemple.com" value={form.email} onChange={event => setForm(current => ({ ...current, email: event.target.value }))} />
 							{errors.email && <span className="field-error">{errors.email}</span>}
 						</div>
 						<div className="field full">
-							<label htmlFor="password">Mot de passe *</label>
+							<label htmlFor="password">{t('password')} *</label>
 							<div className="password-field">
 								<input id="password" type={showPassword ? 'text' : 'password'} aria-invalid={Boolean(errors.password)} placeholder="Saisissez votre mot de passe" value={form.password} onChange={event => setForm(current => ({ ...current, password: event.target.value }))} />
 								<button type="button" className="password-toggle" onClick={() => setShowPassword(current => !current)} aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'} aria-pressed={showPassword}>
-									{showPassword ? 'Masquer' : 'Afficher'}
+									{showPassword ? (
+										<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18M10.6 10.7a2 2 0 0 0 2.7 2.7M9.9 4.2A10.8 10.8 0 0 1 12 4c5.2 0 8.9 4.2 10 8-0.4 1.4-1.2 2.7-2.3 3.8M6.2 6.2C4.3 7.6 2.8 9.7 2 12c1.1 3.8 4.8 8 10 8 1.4 0 2.7-.3 3.9-.8" /></svg>
+									) : (
+										<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-8 10-8 10 8 10 8-3.5 8-10 8S2 12 2 12Zm13 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+									)}
 								</button>
 							</div>
 							{errors.password && <span className="field-error">{errors.password}</span>}
 						</div>
 						<div className="field full">
-							<label htmlFor="role">Profil *</label>
+							<label htmlFor="role">{t('profile')} *</label>
 							<select id="role" aria-invalid={Boolean(errors.role)} value={form.role} onChange={event => setForm(current => ({ ...current, role: event.target.value }))}>
 								<option value="">Sélectionner un profil</option>
 								<option value="client">Client</option>
@@ -88,7 +94,7 @@ export function LoginPage({ setUser }) {
 							{errors.role && <span className="field-error">{errors.role}</span>}
 						</div>
 						<div className="field full">
-							<button type="button" className="btn btn-primary" onClick={handleSubmit}>Se connecter</button>
+							<button type="button" className="btn btn-primary" onClick={handleSubmit}>{t('submit')}</button>
 						</div>
 					</div>
 				</section>

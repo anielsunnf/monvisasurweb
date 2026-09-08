@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import { getServices } from '../api'
+import { useI18n } from '../components/useI18n'
 
 export function CataloguePage() {
+  const { t } = useI18n()
   const [services, setServices] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -43,7 +45,7 @@ export function CataloguePage() {
       <div className="section-header">
         <div>
           <span className="eyebrow">Prestations</span>
-          <h1 className="section-title">Catalogue des services administratifs</h1>
+          <h1 className="section-title">{t('catalogue')}</h1>
           <p className="lead">{services.length} prestations disponibles</p>
         </div>
       </div>
@@ -70,10 +72,10 @@ export function CataloguePage() {
               </ul>
               <div className="card-actions">
                 <NavLink to={`/catalogue/${service.id}`} className="btn btn-ghost">
-                  Détails
+                  {t('details')}
                 </NavLink>
                 <NavLink to="/login" className="btn btn-primary">
-                  Ouvrir un dossier
+                  {t('newCase')}
                 </NavLink>
               </div>
             </article>

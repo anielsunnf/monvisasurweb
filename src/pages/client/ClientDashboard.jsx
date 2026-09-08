@@ -3,8 +3,10 @@ import { NavLink } from 'react-router-dom'
 import { cancelAppointment, cancelOrder, getAppointments, getDossiers, getOrders } from '../../api'
 import { StatusBadge } from '../../components/StatusBadge'
 import { EmptyState } from '../../components/EmptyState'
+import { useI18n } from '../../components/useI18n'
 
 export function ClientDashboard({ user }) {
+  const { t } = useI18n()
   const [dossiers, setDossiers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -38,10 +40,10 @@ export function ClientDashboard({ user }) {
     <main className="container page">
       <div className="section-header">
         <div>
-          <span className="eyebrow">Espace client</span>
-          <h1 className="section-title">Mon espace client</h1>
+          <span className="eyebrow">{t('client')}</span>
+          <h1 className="section-title">{t('client')}</h1>
         </div>
-        <NavLink to="/client/dossiers/nouveau" className="btn btn-primary">Ouvrir un dossier</NavLink>
+        <NavLink to="/client/dossiers/nouveau" className="btn btn-primary">{t('newCase')}</NavLink>
       </div>
 
       <div className="dashboard-grid">

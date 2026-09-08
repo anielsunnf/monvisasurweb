@@ -10,6 +10,12 @@ let notificationStore = []
 let catalogueStore = [...services]
 let journeyStore = [...journeys]
 
+export function getReservationWindow() {
+  const today = new Date()
+  const todayIso = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10)
+  return { min: todayIso, max: '2027-12-31' }
+}
+
 function normalizeCity(value) {
   const normalized = value.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   return normalized === 'younde' ? 'yaounde' : normalized
@@ -30,12 +36,15 @@ export function getJourneyById(id) {
 export function searchJourneys(criteria) {
   const from = normalizeCity(criteria.from)
   const to = normalizeCity(criteria.to)
+  const reservationWindow = getReservationWindow()
 
   return Promise.resolve(journeyStore.filter(journey => (
     normalizeCity(journey.from).includes(from)
     && normalizeCity(journey.to).includes(to)
+    && criteria.date >= reservationWindow.min
+    && criteria.date <= reservationWindow.max
     && criteria.date >= (journey.availableFrom || journey.date)
-    && criteria.date <= (journey.availableTo || journey.date)
+    && criteria.date <= (journey.availableTo || reservationWindow.max)
     && (!criteria.transport || journey.type === criteria.transport)
   )))
 }

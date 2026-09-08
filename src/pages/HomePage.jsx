@@ -1,8 +1,10 @@
 import { NavLink } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { getServices } from '../api'
+import { useI18n } from '../components/useI18n'
 
 export function HomePage() {
+  const { t } = useI18n()
   const [services, setServices] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -21,18 +23,16 @@ export function HomePage() {
         <div className="container hero-inner">
           <div className="hero-text">
             <span className="eyebrow">Mobilité internationale</span>
-            <h1>Des démarches sans friction, de l'arrivée au départ.</h1>
+            <h1>{t('heroTitle')}</h1>
             <p className="lead">
-              Monvisasur centralise vos demandes administratives et vos réservations
-              de transport dans un seul espace, pensé pour les expatriés, étudiants
-              et travailleurs.
+              {t('heroText')}
             </p>
             <div className="cta-row">
               <NavLink to="/catalogue" className="btn btn-primary">
-                Voir le catalogue
+                {t('catalogue')}
               </NavLink>
               <NavLink to="/trajets" className="btn btn-secondary">
-                Chercher un trajet
+                {t('searchTrip')}
               </NavLink>
             </div>
           </div>
@@ -60,9 +60,9 @@ export function HomePage() {
       {/* PRESTATIONS */}
       <section className="section container">
         <div className="section-header">
-          <h2 className="section-title">Prestations les plus demandées</h2>
+          <h2 className="section-title">{t('popular')}</h2>
           <NavLink to="/catalogue" className="btn btn-ghost">
-            Tout découvrir →
+            {t('discover')} →
           </NavLink>
         </div>
 
@@ -107,22 +107,22 @@ export function HomePage() {
       <section className="section section-alt">
         <div className="container">
           <h2 className="section-title" style={{ textAlign: 'center' }}>
-            Comment ça marche
+            {t('how')}
           </h2>
           <div className="steps-grid">
             <div className="step">
               <div className="step-number">1</div>
-              <h3>Choisissez une prestation</h3>
+              <h3>{t('choose')}</h3>
               <p>Parcourez notre catalogue et sélectionnez le service dont vous avez besoin.</p>
             </div>
             <div className="step">
               <div className="step-number">2</div>
-              <h3>Ouvrez un dossier</h3>
+              <h3>{t('open')}</h3>
               <p>Remplissez le formulaire et téléversez vos documents en quelques minutes.</p>
             </div>
             <div className="step">
               <div className="step-number">3</div>
-              <h3>Suivez en temps réel</h3>
+              <h3>{t('track')}</h3>
               <p>Un conseiller traite votre dossier et vous tient informé à chaque étape.</p>
             </div>
           </div>
@@ -131,10 +131,10 @@ export function HomePage() {
 
       {/* CTA FINAL */}
       <section className="section container" style={{ textAlign: 'center' }}>
-        <h2>Prêt à commencer ?</h2>
+        <h2>{t('start')}</h2>
         <p className="lead">Créez votre compte gratuitement et gérez toute votre mobilité en un seul endroit.</p>
         <NavLink to="/login" className="btn btn-primary">
-          Créer un compte
+          {t('create')}
         </NavLink>
       </section>
     </main>

@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { searchJourneys } from '../api'
+import { getReservationWindow, searchJourneys } from '../api'
 import { FilterBar } from '../components/FilterBar'
+import { useI18n } from '../components/useI18n'
 
 export function SearchTripsPage() {
+  const { t } = useI18n()
+  const reservationWindow = getReservationWindow()
   const [form, setForm] = useState({ from: '', to: '', date: '', passengers: '' })
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
@@ -60,8 +63,8 @@ export function SearchTripsPage() {
         <div className="container travel-banner-inner">
           <div>
             <span className="eyebrow">Mobilité Monvisasur</span>
-            <h1>Rechercher un voyage</h1>
-            <p>Comparez les trajets disponibles et préparez votre réservation.</p>
+            <h1>{t('searchTrip')}</h1>
+            <p>{t('compare')}</p>
           </div>
         </div>
       </div>
@@ -69,12 +72,12 @@ export function SearchTripsPage() {
       <div className="container travel-content">
         <section className="travel-search-card">
           <div className="travel-card-heading">
-            <h2>Rechercher un trajet</h2>
+            <h2>{t('searchTrip')}</h2>
             <span aria-hidden="true">▣</span>
           </div>
           <div className="form-grid">
           <div className="field">
-            <label htmlFor="from">Ville de départ *</label>
+            <label htmlFor="from">{t('departure')} *</label>
             <input
               id="from"
               placeholder="Ex : Yaoundé"
@@ -86,7 +89,7 @@ export function SearchTripsPage() {
           </div>
 
           <div className="field">
-            <label htmlFor="to">Ville d'arrivée *</label>
+            <label htmlFor="to">{t('arrival')} *</label>
             <input
               id="to"
               placeholder="Ex : Douala"
@@ -98,10 +101,12 @@ export function SearchTripsPage() {
           </div>
 
           <div className="field">
-            <label htmlFor="date">Date de départ *</label>
+            <label htmlFor="date">{t('date')} *</label>
             <input
               id="date"
               type="date"
+              min={reservationWindow.min}
+              max={reservationWindow.max}
               value={form.date}
               onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
               className={errors.date ? 'input-error' : ''}
@@ -110,7 +115,7 @@ export function SearchTripsPage() {
           </div>
 
           <div className="field">
-            <label htmlFor="passengers">Passagers</label>
+            <label htmlFor="passengers">{t('passengers')}</label>
             <select
               id="passengers"
               value={form.passengers}
@@ -132,7 +137,7 @@ export function SearchTripsPage() {
               onClick={handleSearch}
               disabled={loading}
             >
-              {loading ? 'Recherche en cours...' : 'Rechercher'}
+              {loading ? `${t('search')}...` : t('search')}
             </button>
           </div>
         </div>
@@ -140,7 +145,7 @@ export function SearchTripsPage() {
 
         <aside className="travel-help-card">
           <span className="eyebrow">Monvisasur</span>
-          <h2>Besoin d’assistance ?</h2>
+          <h2>{t('assistance')}</h2>
           <p>Notre équipe peut vous accompagner dans le choix de votre trajet et de votre dossier.</p>
           <div className="help-line"><span aria-hidden="true">✉</span><span>Réponse depuis votre espace client</span></div>
           <NavLink to="/login" className="btn btn-secondary">Contacter Monvisasur</NavLink>
