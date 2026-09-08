@@ -1304,6 +1304,35 @@ textarea:focus {
 .modal-close:hover, .modal-close:focus-visible { background: var(--surface-raised); }
 .theme-light .modal-backdrop { background: rgb(16 33 43 / 40%); }
 .theme-light .modal { background: #fff; border-color: #b7d1d5; box-shadow: 0 24px 64px rgb(16 33 43 / 24%); }
+
+.toast {
+  position: fixed;
+  z-index: 1100;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  width: min(calc(100% - 2.5rem), 29rem);
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: .9rem;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 16px 40px rgb(0 0 0 / 28%);
+  animation: toast-in .2s ease-out;
+}
+.toast > span { display: grid; place-items: center; flex: 0 0 1.7rem; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--accent); color: #06141b; font-weight: 900; }
+.toast p { flex: 1; margin: 0; font-weight: 600; }
+.toast button { border: 0; background: transparent; color: var(--text); cursor: pointer; font-size: 1.35rem; }
+.toast-error { border-left-color: #e77575; }
+.toast-error > span { background: #e77575; color: #351010; }
+.theme-light .toast { background: #fff; border-color: #b7d1d5; box-shadow: 0 16px 40px rgb(16 33 43 / 18%); }
+.btn:disabled, .tab:disabled { cursor: wait; opacity: .72; transform: none; }
+.button-loader { width: 1rem; height: 1rem; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: loader-spin .65s linear infinite; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(1rem); } to { opacity: 1; transform: translateY(0); } }
+@keyframes loader-spin { to { transform: rotate(360deg); } }
 .lang-switcher { position: relative; }
 .lang-btn { display: flex; align-items: center; gap: .4rem; font-size: .875rem; }
 .lang-dropdown { position: absolute; top: calc(100% + .5rem); right: 0; min-width: 160px; z-index: 100; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 10px 24px rgb(0 0 0 / 22%); }
