@@ -4,8 +4,11 @@ import { addDossierDocument, getDossier, replaceDossierDocument, respondToDossie
 import { StatusBadge } from '../../components/StatusBadge'
 import { EmptyState } from '../../components/EmptyState'
 import { Timeline } from '../../components/Timeline'
+import { localizeService } from '../../data/services'
+import { useTranslation } from 'react-i18next'
 
 export function DossierDetailPage({ user }) {
+	const { i18n } = useTranslation()
 	const { id } = useParams()
 	const [dossier, setDossier] = useState(null)
 	const [loading, setLoading] = useState(true)
@@ -37,13 +40,13 @@ export function DossierDetailPage({ user }) {
 	}
 
 	if (loading) {
-		return <main className="container page"><div className="loading-state"><p>Chargement du dossier...</p></div></main>
+		return <main className="container page"><div className="loading-state"><p>{t('ui.loading_file')}</p></div></main>
 	}
 
 	if (!dossier) {
 		return (
 			<main className="container page">
-				<EmptyState title="Dossier introuvable" description="Ce dossier n'existe pas ou ne vous appartient pas." action={<NavLink to="/client" className="btn btn-primary">Retour à mon espace</NavLink>} />
+				<EmptyState title={t('ui.file_not_found')} description={t('ui.file_not_found_description')} action={<NavLink to="/client" className="btn btn-primary">{t('ui.back_to_area')}</NavLink>} />
 			</main>
 		)
 	}
@@ -52,33 +55,33 @@ export function DossierDetailPage({ user }) {
 		<main className="container page">
 			<div className="section-header">
 				<div>
-					<span className="eyebrow">Dossier</span>
+					<span className="eyebrow">{t('ui.file')}</span>
 					<h1 className="section-title">{dossier.id}</h1>
 				</div>
 				<StatusBadge status={dossier.status} />
 			</div>
 			<section className="panel">
-				<h2>{dossier.service}</h2>
+				<h2>{dossier.serviceId ? localizeService({ id: dossier.serviceId, name: dossier.service }, i18n.resolvedLanguage || i18n.language).name : dossier.service}</h2>
 				<div className="form-grid">
-					<div className="field"><label>Nationalité</label><input value={dossier.nationality || ''} readOnly /></div>
-					<div className="field"><label>Destination</label><input value={dossier.destination || ''} readOnly /></div>
-					<div className="field full"><label>Motif</label><textarea value={dossier.motif || ''} readOnly rows="5" /></div>
-					<div className="field full"><label>Pièces transmises</label><input value={(dossier.documents || []).join(', ')} readOnly /></div>
+					<div className="field"><label>{t('ui.nationality')}</label><input value={dossier.nationality || ''} readOnly /></div>
+					<div className="field"><label>{t('ui.destination')}</label><input value={dossier.destination || ''} readOnly /></div>
+					<div className="field full"><label>{t('ui.reason')}</label><textarea value={dossier.motif || ''} readOnly rows="5" /></div>
+					<div className="field full"><label>{t('ui.submitted_documents')}</label><input value={(dossier.documents || []).join(', ')} readOnly /></div>
 				</div>
 			</section>
 			<aside className="summary-box">
-				<h2>Historique</h2>
+				<h2>{t('ui.history')}</h2>
 				<Timeline entries={dossier.history} />
-				{dossier.additionalRequest && <div className="field"><label htmlFor="client-response">Répondre à la demande de pièce</label><textarea id="client-response" rows="4" value={response} onChange={event => setResponse(event.target.value)} placeholder="Indiquez la pièce ou l'information transmise" />{responseSent && <span className="success-message">Réponse envoyée avec succès.</span>}<button type="button" className="btn btn-primary" onClick={handleResponse}>Envoyer la réponse</button></div>}
+				{dossier.additionalRequest && <div className="field"><label htmlFor="client-response">{t('ui.send_response')}</label><textarea id="client-response" rows="4" value={response} onChange={event => setResponse(event.target.value)} placeholder={t('ui.response_placeholder')} />{responseSent && <span className="success-message">{t('ui.response_sent')}</span>}<button type="button" className="btn btn-primary" onClick={handleResponse}>{t('ui.send_response')}</button></div>}
 				<div className="field document-upload">
-					<label htmlFor="additional-document">Ajouter ou modifier un PDF</label>
+					<label htmlFor="additional-document">{t('ui.upload_document')}</label>
 					<select id="document-to-replace" value={documentIndex} onChange={event => setDocumentIndex(event.target.value)}>
-						<option value="">Ajouter un nouveau document</option>
-						{(dossier.documents || []).map((name, index) => <option key={`${name}-${index}`} value={index}>Remplacer : {name}</option>)}
+						<option value="">{t('ui.add_document')}</option>
+						{(dossier.documents || []).map((name, index) => <option key={`${name}-${index}`} value={index}>{t('ui.replace_document', { name })}</option>)}
 					</select>
 					<input id="additional-document" type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={event => setDocument(event.target.files?.[0] || null)} />
-					{documentMessage && <span className="success-message">{documentMessage}</span>}
-					<button type="button" className="btn btn-secondary" onClick={handleDocumentUpload} disabled={!document}>Envoyer le document</button>
+					{documentMessage && <span className="success-message">{t('ui.document_upload_success')}</span>}
+					<button type="button" className="btn btn-secondary" onClick={handleDocumentUpload} disabled={!document}>{t('ui.upload_document')}</button>
 				</div>
 			</aside>
 		</main>

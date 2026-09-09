@@ -8,7 +8,7 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color-scheme: dark light;
+  color-scheme: dark;
 }
 
 html {
@@ -20,6 +20,11 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background: #07131d;
+}
+
+body.light-body {
+  background: #f4f7f8;
+  color: #10212b;
 }
 
 * {

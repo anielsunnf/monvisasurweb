@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { getServices } from '../api'
+import { localizeService } from '../data/services'
 import { useI18n } from '../components/useI18n'
 
 export function HomePage() {
-  const { t } = useI18n()
+  const { t, language } = useI18n()
   const [services, setServices] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -12,9 +13,9 @@ export function HomePage() {
   useEffect(() => {
     getServices()
       .then(data => setServices(data.slice(0, 3)))
-      .catch(() => setError('Impossible de charger les prestations.'))
+      .catch(() => setError(t('common.load_services_error')))
       .finally(() => setLoading(false))
-  }, [])
+  }, [t])
 
   return (
     <main>
@@ -22,7 +23,7 @@ export function HomePage() {
       <section className="hero">
         <div className="container hero-inner">
           <div className="hero-text">
-            <span className="eyebrow">Mobilité internationale</span>
+            <span className="eyebrow">{t('home.eyebrow')}</span>
             <h1>{t('heroTitle')}</h1>
             <p className="lead">
               {t('heroText')}
@@ -38,19 +39,19 @@ export function HomePage() {
           </div>
 
           <div className="hero-panel">
-            <div className="kicker">Mieux accompagné</div>
+            <div className="kicker">{t('home.support')}</div>
             <div className="metric-grid">
               <div className="metric">
                 <strong>14K+</strong>
-                <span>clients suivis</span>
+                <span>{t('home.clients')}</span>
               </div>
               <div className="metric">
                 <strong>96%</strong>
-                <span>dossiers traités</span>
+                <span>{t('home.files_processed')}</span>
               </div>
               <div className="metric">
                 <strong>3 min</strong>
-                <span>pour ouvrir un dossier</span>
+                <span>{t('home.opening_time')}</span>
               </div>
             </div>
           </div>
@@ -62,7 +63,7 @@ export function HomePage() {
         <div className="section-header">
           <h2 className="section-title">{t('popular')}</h2>
           <NavLink to="/catalogue" className="btn btn-ghost">
-            {t('discover')} →
+            {t('discover')}
           </NavLink>
         </div>
 
@@ -75,30 +76,31 @@ export function HomePage() {
         ) : error ? (
           <div className="error-state" role="alert">
             <p>{error}</p>
-            <button type="button" className="btn btn-primary" onClick={() => window.location.reload()}>Réessayer</button>
+            <button type="button" className="btn btn-primary" onClick={() => window.location.reload()}>{t('common.retry')}</button>
           </div>
         ) : services.length === 0 ? (
-          <div className="empty-state">Aucune prestation disponible pour le moment.</div>
+          <div className="empty-state">{t('common.no_services')}</div>
         ) : (
           <div className="card-grid">
-            {services.map(service => (
-              <article key={service.id} className="card">
-                <span className="chip">{service.category}</span>
-                <h3>{service.name}</h3>
-                <p className="small-muted">{service.description}</p>
+            {services.map(service => {
+              const localizedService = localizeService(service, language)
+              return <article key={service.id} className="card">
+                <span className="chip">{localizedService.category}</span>
+                <h3>{localizedService.name}</h3>
+                <p className="small-muted">{localizedService.description}</p>
                 <div className="meta-line">
-                  <span>⏱ {service.delay}</span>
-                  <strong>{service.price.toLocaleString()} FCFA</strong>
+                  <span>⏱ {localizedService.delay}</span>
+                  <strong>{localizedService.price.toLocaleString()} FCFA</strong>
                 </div>
                 <NavLink
                   to={`/catalogue/${service.id}`}
                   className="btn btn-secondary"
                   style={{ marginTop: '1rem' }}
                 >
-                  Voir les détails
+                  {t('common.view_details')}
                 </NavLink>
               </article>
-            ))}
+            })}
           </div>
         )}
       </section>
@@ -113,30 +115,22 @@ export function HomePage() {
             <div className="step">
               <div className="step-number">1</div>
               <h3>{t('choose')}</h3>
-              <p>Parcourez notre catalogue et sélectionnez le service dont vous avez besoin.</p>
+              <p>{t('home.step1_desc')}</p>
             </div>
             <div className="step">
               <div className="step-number">2</div>
               <h3>{t('open')}</h3>
-              <p>Remplissez le formulaire et téléversez vos documents en quelques minutes.</p>
+              <p>{t('home.step2_desc')}</p>
             </div>
             <div className="step">
               <div className="step-number">3</div>
               <h3>{t('track')}</h3>
-              <p>Un conseiller traite votre dossier et vous tient informé à chaque étape.</p>
+              <p>{t('home.step3_desc')}</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA FINAL */}
-      <section className="section container" style={{ textAlign: 'center' }}>
-        <h2>{t('start')}</h2>
-        <p className="lead">Créez votre compte gratuitement et gérez toute votre mobilité en un seul endroit.</p>
-        <NavLink to="/login" className="btn btn-primary">
-          {t('create')}
-        </NavLink>
-      </section>
     </main>
   )
 }

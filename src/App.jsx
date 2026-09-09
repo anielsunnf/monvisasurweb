@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
@@ -21,17 +21,31 @@ import { TripsManagementPage } from './pages/admin/TripsManagementPage'
 import './App.css'
 
 function App() {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('monvisasur.session') || 'null') } catch { return null }
+  })
   const [theme, setTheme] = useState(localStorage.getItem('monvisasur.theme') || 'dark')
+
+  useEffect(() => {
+    document.documentElement.style.colorScheme = theme
+    document.body.classList.toggle('light-body', theme === 'light')
+    return () => document.body.classList.remove('light-body')
+  }, [theme])
 
   function changeTheme(nextTheme) {
     setTheme(nextTheme)
     localStorage.setItem('monvisasur.theme', nextTheme)
   }
 
+  function changeUser(nextUser) {
+    setUser(nextUser)
+    if (nextUser) localStorage.setItem('monvisasur.session', JSON.stringify(nextUser))
+    else localStorage.removeItem('monvisasur.session')
+  }
+
   return (
     <div className={`app-shell theme-${theme}`}>
-      <Header user={user} onLogout={() => setUser(null)} theme={theme} onThemeChange={changeTheme} />
+      <Header user={user} onLogout={() => changeUser(null)} theme={theme} onThemeChange={changeTheme} />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/catalogue" element={<CataloguePage />} />
@@ -44,7 +58,7 @@ function App() {
         } />
         <Route path="/rendez-vous" element={<ProtectedRoute user={user} requiredRole="client"><AppointmentPage user={user} /></ProtectedRoute>} />
         <Route path="/billet/:reference" element={<ProtectedRoute user={user} requiredRole="client"><TicketPage user={user} /></ProtectedRoute>} />
-        <Route path="/login" element={<LoginPage user={user} setUser={setUser} />} />
+        <Route path="/login" element={<LoginPage user={user} setUser={changeUser} />} />
         <Route path="/client" element={
           <ProtectedRoute user={user} requiredRole="client">
             <ClientDashboard user={user} />
@@ -62,8 +76,8 @@ function App() {
         } />
         <Route path="/client/notifications" element={<ProtectedRoute user={user} requiredRole="client"><NotificationsPage user={user} /></ProtectedRoute>} />
         <Route path="/admin" element={
-          <ProtectedRoute user={user} requiredRole="admin">
-            <AdminDashboard />
+          <ProtectedRoute user={user} allowedRoles={['admin', 'advisor']}>
+            <AdminDashboard user={user} />
           </ProtectedRoute>
         } />
         <Route path="/admin/catalogue" element={<ProtectedRoute user={user} requiredRole="admin"><CatalogueManagementPage /></ProtectedRoute>} />

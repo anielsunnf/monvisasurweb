@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { loginUser, registerUser } from '../api'
 import { useI18n } from '../components/useI18n'
 import { useTranslation } from 'react-i18next'
 import { Toast } from '../components/Toast'
 
-export function LoginPage({ setUser }) {
+export function LoginPage({ user, setUser }) {
 	const { t } = useI18n()
 	const { t: translate } = useTranslation()
 	const navigate = useNavigate()
@@ -16,6 +16,11 @@ export function LoginPage({ setUser }) {
 	const [showPassword, setShowPassword] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [toast, setToast] = useState(null)
+
+	if (user) {
+		const target = user.role === 'admin' || user.role === 'advisor' ? '/admin' : '/client'
+		return <Navigate to={target} replace />
+	}
 
 	async function handleSubmit() {
 		const nextErrors = {}
@@ -35,7 +40,7 @@ export function LoginPage({ setUser }) {
 		setIsSubmitting(true)
 		try {
 			const account = mode === 'register'
-				? await registerUser({ ...form, email: form.email.trim() })
+				? await registerUser({ ...form, role: 'client', email: form.email.trim() })
 				: await loginUser({ email: form.email.trim(), password: form.password, role: form.role })
 			setUser(account)
 			const messageKey = account.role === 'admin' ? 'feedback.admin_success' : account.role === 'advisor' ? 'feedback.advisor_success' : 'feedback.client_success'
@@ -52,25 +57,25 @@ export function LoginPage({ setUser }) {
 			{toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
 			<div className="auth-layout">
 				<aside className="auth-side">
-					<span className="eyebrow" style={{ color: '#f8d36d' }}>Plateforme</span>
-					<h1 style={{ color: 'white', margin: '0.8rem 0' }}>Un seul compte pour gérer votre mobilité.</h1>
+					<span className="eyebrow" style={{ color: '#f8d36d' }}>{t('login.title')}</span>
+					<h1 style={{ color: 'white', margin: '0.8rem 0' }}>{t('login.title')}</h1>
 					<ul>
-						<li>Ouvrir un dossier administratif</li>
-						<li>Suivre l’avancement en temps réel</li>
-						<li>Réserver un billet de train, avion ou bus</li>
+						<li>{t('home.step2_title')}</li>
+						<li>{t('home.step3_title')}</li>
+						<li>{t('nav.book')}</li>
 					</ul>
 				</aside>
 
 				<section className="panel">
 					<div className="tab-row" aria-label="Mode d'accès">
 						<button type="button" disabled={isSubmitting} className={`tab ${mode === 'login' ? 'active' : ''}`} onClick={() => { setMode('login'); setErrors({}); setSubmitError('') }}>{t('login')}</button>
-						<button type="button" disabled={isSubmitting} className={`tab ${mode === 'register' ? 'active' : ''}`} onClick={() => { setMode('register'); setErrors({}); setSubmitError('') }}>{t('register')}</button>
+						<button type="button" disabled={isSubmitting} className={`tab ${mode === 'register' ? 'active' : ''}`} onClick={() => { setMode('register'); setForm(current => ({ ...current, role: 'client' })); setErrors({}); setSubmitError('') }}>{t('register')}</button>
 					</div>
 					<h2>{mode === 'login' ? t('login') : t('create')}</h2>
 					{submitError && <div className="alert alert-error" role="alert">{submitError}</div>}
 					<div className="form-grid">
 						{mode === 'register' && <div className="field full">
-							<label htmlFor="name">Nom complet *</label>
+							<label htmlFor="name">{t('ui.full_name')} *</label>
 							<input id="name" aria-invalid={Boolean(errors.name)} placeholder="Votre nom complet" value={form.name} onChange={event => setForm(current => ({ ...current, name: event.target.value }))} />
 							{errors.name && <span className="field-error">{errors.name}</span>}
 						</div>}
@@ -93,16 +98,16 @@ export function LoginPage({ setUser }) {
 							</div>
 							{errors.password && <span className="field-error">{errors.password}</span>}
 						</div>
-						<div className="field full">
+						{mode === 'login' && <div className="field full">
 							<label htmlFor="role">{t('profile')} *</label>
 							<select id="role" disabled={isSubmitting} aria-invalid={Boolean(errors.role)} value={form.role} onChange={event => setForm(current => ({ ...current, role: event.target.value }))}>
-								<option value="">Sélectionner un profil</option>
-								<option value="client">Client</option>
-								<option value="advisor">Conseiller</option>
-								<option value="admin">Administrateur</option>
+								<option value="">{t('common.select')}</option>
+								<option value="client">{t('nav.client')}</option>
+								<option value="advisor">{t('ui.advisor')}</option>
+								<option value="admin">{t('ui.admin_title')}</option>
 							</select>
 							{errors.role && <span className="field-error">{errors.role}</span>}
-						</div>
+						</div>}
 						<div className="field full">
 							<button type="button" className="btn btn-primary" onClick={handleSubmit} disabled={isSubmitting}>{isSubmitting && <span className="button-loader" aria-hidden="true" />}{isSubmitting ? translate('feedback.logging_in') : t('submit')}</button>
 						</div>

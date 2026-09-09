@@ -62,9 +62,9 @@ export function SearchTripsPage() {
       <div className="travel-banner">
         <div className="container travel-banner-inner">
           <div>
-            <span className="eyebrow">Mobilité Monvisasur</span>
-            <h1>{t('searchTrip')}</h1>
-            <p>{t('compare')}</p>
+            <span className="eyebrow">{t('search.eyebrow')}</span>
+            <h1>{t('search.title')}</h1>
+            <p>{t('search.description')}</p>
           </div>
         </div>
       </div>
@@ -72,12 +72,12 @@ export function SearchTripsPage() {
       <div className="container travel-content">
         <section className="travel-search-card">
           <div className="travel-card-heading">
-            <h2>{t('searchTrip')}</h2>
+            <h2>{t('search.title')}</h2>
             <span aria-hidden="true">▣</span>
           </div>
           <div className="form-grid">
           <div className="field">
-            <label htmlFor="from">{t('departure')} *</label>
+            <label htmlFor="from">{t('search.from')} *</label>
             <input
               id="from"
               placeholder="Ex : Yaoundé"
@@ -89,7 +89,7 @@ export function SearchTripsPage() {
           </div>
 
           <div className="field">
-            <label htmlFor="to">{t('arrival')} *</label>
+            <label htmlFor="to">{t('search.to')} *</label>
             <input
               id="to"
               placeholder="Ex : Douala"
@@ -101,7 +101,7 @@ export function SearchTripsPage() {
           </div>
 
           <div className="field">
-            <label htmlFor="date">{t('date')} *</label>
+            <label htmlFor="date">{t('search.date')} *</label>
             <input
               id="date"
               type="date"
@@ -115,16 +115,16 @@ export function SearchTripsPage() {
           </div>
 
           <div className="field">
-            <label htmlFor="passengers">{t('passengers')}</label>
+            <label htmlFor="passengers">{t('search.passengers')}</label>
             <select
               id="passengers"
               value={form.passengers}
               onChange={e => setForm(f => ({ ...f, passengers: e.target.value }))}
               className={errors.passengers ? 'input-error' : ''}
             >
-              <option value="">Sélectionner le nombre de passagers</option>
+              <option value="">{t('common.select')} {t('search.passengers').toLowerCase()}</option>
               {[1, 2, 3, 4, 5].map(n => (
-                <option key={n} value={n}>{n} passager{n > 1 ? 's' : ''}</option>
+                <option key={n} value={n}>{n} {n > 1 ? t('ui.passengers') : t('ui.passenger')}</option>
               ))}
             </select>
             {errors.passengers && <span className="field-error">{errors.passengers}</span>}
@@ -145,10 +145,10 @@ export function SearchTripsPage() {
 
         <aside className="travel-help-card">
           <span className="eyebrow">Monvisasur</span>
-          <h2>{t('assistance')}</h2>
-          <p>Notre équipe peut vous accompagner dans le choix de votre trajet et de votre dossier.</p>
-          <div className="help-line"><span aria-hidden="true">✉</span><span>Réponse depuis votre espace client</span></div>
-          <NavLink to="/login" className="btn btn-secondary">Contacter Monvisasur</NavLink>
+          <h2>{t('booking.assistance')}</h2>
+          <p>{t('search.help_description')}</p>
+          <div className="help-line"><span aria-hidden="true">✉</span><span>{t('search.help_response')}</span></div>
+          <NavLink to="/login" className="btn btn-secondary">{t('search.contact')}</NavLink>
         </aside>
       </div>
 
@@ -159,17 +159,17 @@ export function SearchTripsPage() {
             {loading ? (
               <div className="loading-state">
                 <div className="spinner" />
-                <p>Recherche des trajets...</p>
+                <p>{t('search.searching')}</p>
               </div>
             ) : requestError ? (
               <div className="error-state" role="alert">
                 <p>{requestError}</p>
-                <button type="button" className="btn btn-primary" onClick={handleSearch}>Réessayer</button>
+                <button type="button" className="btn btn-primary" onClick={handleSearch}>{t('common.retry')}</button>
               </div>
             ) : filtered.length === 0 ? (
               <div className="empty-state">
-                <p>🔍 Aucun trajet trouvé pour cette recherche.</p>
-                <p className="small-muted">Essayez avec d'autres dates ou villes.</p>
+                <p>🔍 {t('search.no_results')}</p>
+                <p className="small-muted">{t('search.try_again')}</p>
               </div>
             ) : (
               filtered.map(journey => (
@@ -195,7 +195,7 @@ export function SearchTripsPage() {
           </div>
 
           <aside className="summary-box">
-            <h3>Filtres et tri</h3>
+            <h3>{t('search.filters')}</h3>
             <FilterBar sortBy={sortBy} onSortChange={setSortBy} transport={filterType} onTransportChange={setFilterType} carrier={carrier} onCarrierChange={setCarrier} carriers={[...new Set(results.map(journey => journey.transport))]} />
           </aside>
         </div>

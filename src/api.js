@@ -1,14 +1,76 @@
 import { services } from './data/services'
 import { journeys } from './data/journeys'
 
-let dossierStore = []
-const USER_STORAGE_KEY = 'monvisasur.users'
-let userStore = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || '[]')
-let orderStore = []
-let appointmentStore = []
-let notificationStore = []
-let catalogueStore = [...services]
-let journeyStore = [...journeys]
+const STORAGE_KEYS = {
+  users: 'monvisasur.users', dossiers: 'monvisasur.dossiers', orders: 'monvisasur.orders',
+  appointments: 'monvisasur.appointments', notifications: 'monvisasur.notifications',
+  catalogue: 'monvisasur.catalogue', journeys: 'monvisasur.journeys', session: 'monvisasur.session',
+}
+
+function getStorage() {
+  const candidates = []
+
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) candidates.push(window.localStorage)
+    if (typeof globalThis !== 'undefined' && globalThis.localStorage) candidates.push(globalThis.localStorage)
+  } catch {
+    // no browser storage available, keep the app functional in tests or non-browser contexts
+  }
+
+  const validStorage = candidates.find(storage => storage && typeof storage.getItem === 'function' && typeof storage.setItem === 'function')
+  if (validStorage) return validStorage
+
+  const memoryStore = new Map()
+  return {
+    getItem(key) {
+      return memoryStore.has(key) ? memoryStore.get(key) : null
+    },
+    setItem(key, value) {
+      memoryStore.set(key, String(value))
+    },
+    removeItem(key) {
+      memoryStore.delete(key)
+    },
+    clear() {
+      memoryStore.clear()
+    },
+  }
+}
+
+function loadStore(key, fallback) {
+  const storage = getStorage()
+  if (!storage) return fallback
+  try { return JSON.parse(storage.getItem(key) || 'null') || fallback } catch { return fallback }
+}
+function saveStore(key, value) {
+  const storage = getStorage()
+  if (!storage) return
+  storage.setItem(key, JSON.stringify(value))
+}
+
+const demoUsers = [
+  { id: 'USR-ADMIN', email: 'admin@monvisasur.test', password: 'Admin123!', role: 'admin', name: 'Administrateur démo' },
+  { id: 'USR-ADVISOR', email: 'conseiller@monvisasur.test', password: 'Conseiller123!', role: 'advisor', name: 'Conseiller démo' },
+  { id: 'USR-CLIENT', email: 'client@monvisasur.test', password: 'Client123!', role: 'client', name: 'Client démo' },
+]
+
+let dossierStore = loadStore(STORAGE_KEYS.dossiers, [])
+const USER_STORAGE_KEY = STORAGE_KEYS.users
+let userStore = loadStore(USER_STORAGE_KEY, demoUsers)
+let orderStore = loadStore(STORAGE_KEYS.orders, [])
+let appointmentStore = loadStore(STORAGE_KEYS.appointments, [])
+let notificationStore = loadStore(STORAGE_KEYS.notifications, [])
+let catalogueStore = loadStore(STORAGE_KEYS.catalogue, services.map(service => ({ ...service, active: service.active !== false })))
+let journeyStore = loadStore(STORAGE_KEYS.journeys, journeys)
+
+userStore = [...demoUsers, ...userStore.filter(user => !demoUsers.some(demo => demo.email === user.email))]
+saveStore(USER_STORAGE_KEY, userStore)
+function persistDossiers() { saveStore(STORAGE_KEYS.dossiers, dossierStore) }
+function persistOrders() { saveStore(STORAGE_KEYS.orders, orderStore) }
+function persistAppointments() { saveStore(STORAGE_KEYS.appointments, appointmentStore) }
+function persistNotifications() { saveStore(STORAGE_KEYS.notifications, notificationStore) }
+function persistCatalogue() { saveStore(STORAGE_KEYS.catalogue, catalogueStore) }
+function persistJourneys() { saveStore(STORAGE_KEYS.journeys, journeyStore) }
 
 export function getReservationWindow() {
   const today = new Date()
@@ -22,11 +84,11 @@ function normalizeCity(value) {
 }
 
 export function getServices() {
-  return Promise.resolve(catalogueStore)
+  return Promise.resolve(catalogueStore.filter(service => service.active !== false))
 }
 
 export function getServiceById(id) {
-  return Promise.resolve(catalogueStore.find(service => service.id === id) ?? null)
+  return Promise.resolve(catalogueStore.find(service => service.id === id && service.active !== false) ?? null)
 }
 
 export function getJourneyById(id) {
@@ -46,6 +108,7 @@ export function searchJourneys(criteria) {
     && criteria.date >= (journey.availableFrom || journey.date)
     && criteria.date <= (journey.availableTo || reservationWindow.max)
     && (!criteria.transport || journey.type === criteria.transport)
+    && journey.seats >= Number(criteria.passengers || 1)
   )))
 }
 
@@ -72,6 +135,7 @@ export function createDossier(dossier) {
     clientResponse: '',
   }
   dossierStore = [...dossierStore, created]
+  persistDossiers()
   addNotification({ userId: dossier.userId, title: 'Dossier créé', message: `Votre dossier ${created.id} a été enregistré.` })
   return Promise.resolve(created)
 }
@@ -83,6 +147,7 @@ export function updateDossierStatus(id, status) {
     status,
     history: [...(dossier.history || []), { label: `Statut : ${status}`, date: new Date().toLocaleDateString('fr-FR'), description: 'Statut mis à jour par le conseiller.' }],
   } : dossier)
+  persistDossiers()
   if (target) addNotification({ userId: target.userId, title: 'Statut mis à jour', message: `Le dossier ${id} est maintenant : ${status}.` })
   return Promise.resolve()
 }
@@ -94,6 +159,7 @@ export function requestDossierDocument(id, request) {
     additionalRequest: request,
     history: [...(dossier.history || []), { label: 'Pièce complémentaire demandée', date: new Date().toLocaleDateString('fr-FR'), description: request }],
   } : dossier)
+  persistDossiers()
   if (target) addNotification({ userId: target.userId, title: 'Pièce complémentaire demandée', message: request })
   return Promise.resolve()
 }
@@ -104,6 +170,7 @@ export function respondToDossierRequest(id, response) {
     clientResponse: response,
     history: [...(dossier.history || []), { label: 'Réponse du client', date: new Date().toLocaleDateString('fr-FR'), description: response }],
   } : dossier)
+  persistDossiers()
   return Promise.resolve()
 }
 
@@ -115,6 +182,7 @@ export function addDossierDocument(id, userId, document) {
     documents: [...(dossier.documents || []), document.name],
     history: [...(dossier.history || []), { label: 'Pièce complémentaire transmise', date: new Date().toLocaleDateString('fr-FR'), description: document.name }],
   } : dossier)
+  persistDossiers()
   addNotification({ userId, title: 'Pièce complémentaire transmise', message: document.name })
   return Promise.resolve()
 }
@@ -124,9 +192,10 @@ export function registerUser({ email, password, role, name }) {
   const existing = userStore.find(user => user.email === normalizedEmail)
   if (existing) return Promise.reject(new Error('Cette adresse email est déjà utilisée.'))
 
-  const user = { id: `USR-${Date.now()}`, email: normalizedEmail, password, role, name: name.trim() }
+  if (role !== 'client') return Promise.reject(new Error('Seul un compte client peut être créé depuis cette page.'))
+  const user = { id: `USR-${Date.now()}`, email: normalizedEmail, password, role: 'client', name: name.trim() }
   userStore = [...userStore, user]
-  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userStore))
+  saveStore(USER_STORAGE_KEY, userStore)
   return Promise.resolve({ id: user.id, email: user.email, role: user.role, name: user.name })
 }
 
@@ -139,8 +208,13 @@ export function loginUser({ email, password, role }) {
 }
 
 export function createOrder(order) {
+  const journey = journeyStore.find(candidate => candidate.id === order.journeyId)
+  const passengerCount = order.passengers?.length || 0
+  if (!journey) return Promise.reject(new Error('Trajet introuvable.'))
+  if (passengerCount < 1 || journey.seats < passengerCount) return Promise.reject(new Error('Le nombre de places disponibles est insuffisant.'))
   const created = {
     ...order,
+    journey: { ...journey },
     id: `CMD-${Date.now()}`,
     status: 'confirmée',
     paymentStatus: order.paymentStatus || 'paiement simulé confirmé',
@@ -149,6 +223,9 @@ export function createOrder(order) {
     cancelledAt: '',
   }
   orderStore = [...orderStore, created]
+  journeyStore = journeyStore.map(candidate => candidate.id === journey.id ? { ...candidate, seats: candidate.seats - passengerCount } : candidate)
+  persistOrders()
+  persistJourneys()
   addNotification({ userId: order.userId, title: 'Réservation confirmée', message: `Commande ${created.reference} confirmée.` })
   return Promise.resolve(created)
 }
@@ -160,9 +237,13 @@ export function getOrders(userId) {
 export function cancelOrder(id, userId) {
   const order = orderStore.find(candidate => candidate.id === id && candidate.userId === userId)
   if (!order) return Promise.reject(new Error('Commande introuvable.'))
-  const daysUntilDeparture = Math.ceil((new Date(`${order.journey.date}T${order.journey.departure}`) - new Date()) / 86400000)
+  const departureDate = order.selectedDate || order.journey.date
+  const daysUntilDeparture = Math.ceil((new Date(`${departureDate}T${order.journey.departure}`) - new Date()) / 86400000)
   if (daysUntilDeparture < 2) return Promise.reject(new Error('Annulation possible jusqu’à 48 heures avant le départ.'))
   orderStore = orderStore.map(candidate => candidate.id === id ? { ...candidate, status: 'annulée', cancelledAt: new Date().toLocaleDateString('fr-FR') } : candidate)
+  journeyStore = journeyStore.map(candidate => candidate.id === order.journeyId ? { ...candidate, seats: candidate.seats + order.passengers.length } : candidate)
+  persistOrders()
+  persistJourneys()
   addNotification({ userId, title: 'Commande annulée', message: `La commande ${order.reference} a été annulée.` })
   return Promise.resolve()
 }
@@ -170,6 +251,7 @@ export function cancelOrder(id, userId) {
 export function createAppointment(appointment) {
   const created = { ...appointment, id: `RDV-${Date.now()}`, status: 'confirmé' }
   appointmentStore = [...appointmentStore, created]
+  persistAppointments()
   addNotification({ userId: appointment.userId, title: 'Rendez-vous confirmé', message: `Rendez-vous le ${appointment.date} à ${appointment.slot}.` })
   return Promise.resolve(created)
 }
@@ -178,6 +260,7 @@ export function cancelAppointment(id, userId) {
   const appointment = appointmentStore.find(item => item.id === id && item.userId === userId)
   if (!appointment) return Promise.reject(new Error('Rendez-vous introuvable.'))
   appointmentStore = appointmentStore.map(item => item.id === id ? { ...item, status: 'annulé' } : item)
+  persistAppointments()
   addNotification({ userId, title: 'Rendez-vous annulé', message: `Le rendez-vous du ${appointment.date} à ${appointment.slot} a été annulé.` })
   return Promise.resolve()
 }
@@ -196,16 +279,19 @@ export function getNotifications(userId) {
 
 export function addNotification(notification) {
   notificationStore = [...notificationStore, { ...notification, id: `NOT-${Date.now()}`, channel: 'email-simulé', read: false }]
+  persistNotifications()
   return Promise.resolve()
 }
 
 export function updateService(id, changes) {
   catalogueStore = catalogueStore.map(service => service.id === id ? { ...service, ...changes } : service)
+  persistCatalogue()
   return Promise.resolve()
 }
 
 export function updateJourney(id, changes) {
   journeyStore = journeyStore.map(journey => journey.id === id ? { ...journey, ...changes } : journey)
+  persistJourneys()
   return Promise.resolve()
 }
 
@@ -230,6 +316,23 @@ export function replaceDossierDocument(id, userId, index, document) {
       history: [...(dossier.history || []), { label: 'Pièce remplacée', date: new Date().toLocaleDateString('fr-FR'), description: document.name }],
     }
   })
+  persistDossiers()
   addNotification({ userId, title: 'Pièce remplacée', message: document.name })
   return Promise.resolve()
+}
+
+export function getAdvisors() {
+  return Promise.resolve(userStore
+    .filter(user => user.role === 'advisor')
+    .map(({ password: _password, ...user }) => user))
+}
+
+export function assignDossierAdvisor(id, advisorId) {
+  dossierStore = dossierStore.map(dossier => dossier.id === id ? { ...dossier, advisorId } : dossier)
+  persistDossiers()
+  return Promise.resolve()
+}
+
+export function getAdvisorDossiers(advisorId) {
+  return Promise.resolve(dossierStore.filter(dossier => dossier.advisorId === advisorId))
 }

@@ -1,16 +1,19 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { createDossier } from '../../api'
-import { services } from '../../data/services'
+import { createDossier, getServices } from '../../api'
+import { localizeService } from '../../data/services'
 
 export function NewDossierPage({ user }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const [form, setForm] = useState({ serviceId: '', nationality: '', destination: '', motif: '', document: null })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [services, setServices] = useState([])
+
+  useEffect(() => { getServices().then(setServices) }, [])
 
   function validate() {
     const nextErrors = {}
@@ -18,6 +21,8 @@ export function NewDossierPage({ user }) {
     if (!form.nationality.trim()) nextErrors.nationality = t('dossier.err_nationality')
     if (!form.motif.trim()) nextErrors.motif = t('dossier.err_motif')
     if (!form.document) nextErrors.document = t('dossier.err_document')
+    else if (!['application/pdf', 'image/jpeg', 'image/png'].includes(form.document.type)) nextErrors.document = t('dossier.err_document_type')
+    else if (form.document.size > 5 * 1024 * 1024) nextErrors.document = t('dossier.err_document_size')
     return nextErrors
   }
 
@@ -27,7 +32,8 @@ export function NewDossierPage({ user }) {
     setLoading(true)
     try {
       const service = services.find(item => item.id === form.serviceId)
-      await createDossier({ userId: user.id, serviceId: form.serviceId, service: service?.name ?? form.serviceId, nationality: form.nationality, destination: form.destination, motif: form.motif, documents: [form.document?.name ?? 'document.pdf'] })
+      const localizedService = service ? localizeService(service, i18n.resolvedLanguage || i18n.language) : null
+      await createDossier({ userId: user.id, serviceId: form.serviceId, service: localizedService?.name ?? form.serviceId, nationality: form.nationality, destination: form.destination, motif: form.motif, documents: [form.document?.name ?? 'document.pdf'] })
       setSuccess(true)
       setTimeout(() => navigate('/client'), 2000)
     } catch {
@@ -41,7 +47,7 @@ export function NewDossierPage({ user }) {
   return <main className="container page"><div className="section-header"><div><span className="eyebrow">{t('dossier.eyebrow')}</span><h1 className="section-title">{t('dossier.title')}</h1></div></div><div className="panel">
     {errors.submit && <div className="alert alert-error">{errors.submit}</div>}
     <div className="form-grid">
-      <div className="field full"><label htmlFor="service">{t('dossier.service')} *</label><select id="service" value={form.serviceId} onChange={event => update('serviceId', event.target.value)} className={errors.serviceId ? 'input-error' : ''}><option value="">{t('dossier.service_placeholder')}</option>{services.map(service => <option key={service.id} value={service.id}>{service.name}</option>)}</select>{errors.serviceId && <span className="field-error">{errors.serviceId}</span>}</div>
+      <div className="field full"><label htmlFor="service">{t('dossier.service')} *</label><select id="service" value={form.serviceId} onChange={event => update('serviceId', event.target.value)} className={errors.serviceId ? 'input-error' : ''}><option value="">{t('dossier.service_placeholder')}</option>{services.map(service => <option key={service.id} value={service.id}>{localizeService(service, i18n.resolvedLanguage || i18n.language).name}</option>)}</select>{errors.serviceId && <span className="field-error">{errors.serviceId}</span>}</div>
       <div className="field"><label htmlFor="nationality">{t('dossier.nationality')} *</label><input id="nationality" placeholder={t('dossier.nationality_placeholder')} value={form.nationality} onChange={event => update('nationality', event.target.value)} className={errors.nationality ? 'input-error' : ''} />{errors.nationality && <span className="field-error">{errors.nationality}</span>}</div>
       <div className="field"><label htmlFor="destination">{t('dossier.destination')}</label><input id="destination" placeholder={t('dossier.destination_placeholder')} value={form.destination} onChange={event => update('destination', event.target.value)} /></div>
       <div className="field full"><label htmlFor="motif">{t('dossier.motif')} *</label><textarea id="motif" rows="4" placeholder={t('dossier.motif_placeholder')} value={form.motif} onChange={event => update('motif', event.target.value)} className={errors.motif ? 'input-error' : ''} />{errors.motif && <span className="field-error">{errors.motif}</span>}</div>

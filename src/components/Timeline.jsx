@@ -1,5 +1,8 @@
+import { useTranslation } from 'react-i18next'
+
 export function Timeline({ entries = [] }) {
-  if (entries.length === 0) return <p className="small-muted">Aucun événement enregistré.</p>
+  const { t } = useTranslation()
+  if (entries.length === 0) return <p className="small-muted">{t('ui.none')}</p>
 
   return (
     <div className="timeline">

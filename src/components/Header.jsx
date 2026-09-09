@@ -8,13 +8,13 @@ export function Header({ user, onLogout, theme, onThemeChange }) {
 
   return <header className="header">
     <div className="container topbar">
-      <NavLink to="/" className="brand" aria-label="Accueil Monvisasur"><span className="brand-mark">M</span>Monvisasur</NavLink>
-      <nav className="main-nav" aria-label="Navigation principale">
+      <NavLink to="/" className="brand" aria-label={`${t('nav.home')} Monvisasur`}><span className="brand-mark">M</span>Monvisasur</NavLink>
+      <nav className="main-nav" aria-label={t('nav.home')}>
         <NavLink to="/" className={navClass}>{t('nav.home')}</NavLink>
         <NavLink to="/catalogue" className={navClass}>{t('nav.catalogue')}</NavLink>
         <NavLink to="/trajets" className={navClass}>{t('nav.book')}</NavLink>
-        {user && <NavLink to="/client" className={navClass}>{t('nav.client')}</NavLink>}
-        {user?.role === 'admin' && <NavLink to="/admin" className={navClass}>{t('nav.backoffice')}</NavLink>}
+        {user?.role === 'client' && <NavLink to="/client" className={navClass}>{t('nav.client')}</NavLink>}
+        {['admin', 'advisor'].includes(user?.role) && <NavLink to="/admin" className={navClass}>{t('nav.backoffice')}</NavLink>}
       </nav>
       <div className="header-actions">
         <button type="button" className="theme-toggle" onClick={() => onThemeChange(theme === 'dark' ? 'light' : 'dark')} aria-label={theme === 'dark' ? t('common.light') : t('common.dark')}>{theme === 'dark' ? '☼' : '◐'}</button>

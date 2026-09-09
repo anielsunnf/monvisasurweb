@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import { getServices } from '../api'
+import { localizeService } from '../data/services'
 import { useI18n } from '../components/useI18n'
 
 export function CataloguePage() {
-  const { t } = useI18n()
+  const { t, language } = useI18n()
   const [services, setServices] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -12,16 +13,16 @@ export function CataloguePage() {
   useEffect(() => {
     getServices()
       .then(setServices)
-      .catch(() => setError('Impossible de charger le catalogue.'))
+      .catch(() => setError(t('common.load_catalogue_error')))
       .finally(() => setLoading(false))
-  }, [])
+  }, [t])
 
   if (loading) {
     return (
       <main className="container page">
         <div className="loading-state">
           <div className="spinner" />
-          <p>Chargement du catalogue...</p>
+          <p>{t('common.loading')}</p>
         </div>
       </main>
     )
@@ -33,7 +34,7 @@ export function CataloguePage() {
         <div className="error-state">
           <p>⚠️ {error}</p>
           <button className="btn btn-primary" onClick={() => window.location.reload()}>
-            Réessayer
+            {t('common.retry')}
           </button>
         </div>
       </main>
@@ -44,30 +45,31 @@ export function CataloguePage() {
     <main className="container page">
       <div className="section-header">
         <div>
-          <span className="eyebrow">Prestations</span>
+          <span className="eyebrow">{t('catalogue.eyebrow')}</span>
           <h1 className="section-title">{t('catalogue')}</h1>
-          <p className="lead">{services.length} prestations disponibles</p>
+          <p className="lead">{t('catalogue.available_count', { count: services.length })}</p>
         </div>
       </div>
 
       {services.length === 0 ? (
         <div className="empty-state">
-          <p>Aucune prestation disponible pour le moment.</p>
+          <p>{t('common.no_services')}</p>
         </div>
       ) : (
         <div className="card-grid">
-          {services.map(service => (
-            <article key={service.id} className="card">
-              <span className="chip">{service.category}</span>
-              <h3>{service.name}</h3>
-              <p className="small-muted">{service.description}</p>
+          {services.map(service => {
+            const localizedService = localizeService(service, language)
+            return <article key={service.id} className="card">
+              <span className="chip">{localizedService.category}</span>
+              <h3>{localizedService.name}</h3>
+              <p className="small-muted">{localizedService.description}</p>
               <div className="meta-line" style={{ margin: '0.75rem 0' }}>
-                <span>⏱ {service.delay}</span>
-                <strong>{service.price.toLocaleString()} FCFA</strong>
+                <span>⏱ {localizedService.delay}</span>
+                <strong>{localizedService.price.toLocaleString()} FCFA</strong>
               </div>
               <ul className="doc-list">
-                {service.documents.map(doc => (
-                  <li key={doc}>📎 {doc}</li>
+                {localizedService.documents.map(doc => (
+                  <li key={doc}>{doc}</li>
                 ))}
               </ul>
               <div className="card-actions">
@@ -79,7 +81,7 @@ export function CataloguePage() {
                 </NavLink>
               </div>
             </article>
-          ))}
+          })}
         </div>
       )}
     </main>
