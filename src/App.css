@@ -156,7 +156,9 @@
   width: 9rem;
   height: 3.2rem;
   object-fit: contain;
-  filter: brightness(0) invert(1);
+  padding: 0.25rem 0.45rem;
+  border-radius: 0.35rem;
+  background: #ffffff;
 }
 
 .footer-copy {
