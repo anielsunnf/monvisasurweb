@@ -1624,6 +1624,62 @@ textarea:focus {
 .theme-light .status-cancelled,
 .theme-light .field-error { color: #8c2d2d; }
 
+/* Keep headings readable when the dark system rules above have higher specificity. */
+.theme-light .page h1,
+.theme-light .page h2,
+.theme-light .page h3,
+.theme-light .section-title,
+.theme-light .section-alt h2,
+.theme-light .section-alt h3,
+.theme-light .hero h1,
+.theme-light .hero h2,
+.theme-light .hero h3,
+.theme-light .hero p,
+.theme-light .success-state h1,
+.theme-light .success-state h2,
+.theme-light .error-state h1,
+.theme-light .error-state h2,
+.theme-light .empty-state h1,
+.theme-light .empty-state h2 {
+  color: #10212b;
+}
+
+.theme-light .page > .section-header,
+.theme-light .page > .section-header p,
+.theme-light .page > .section-header .lead {
+  color: #526976;
+}
+
+.theme-light .page > .section-header h1,
+.theme-light .page > .section-header h2,
+.theme-light .page > .section-header h3 {
+  color: #10212b;
+}
+
+.theme-light .panel h1,
+.theme-light .panel h2,
+.theme-light .panel h3,
+.theme-light .summary-box h1,
+.theme-light .summary-box h2,
+.theme-light .summary-box h3,
+.theme-light .card h1,
+.theme-light .card h2,
+.theme-light .card h3,
+.theme-light .list-card strong,
+.theme-light .ticket-card h1 {
+  color: #10212b;
+}
+
+.theme-light .panel p,
+.theme-light .summary-box p,
+.theme-light .card p,
+.theme-light .ticket-card p,
+.theme-light .list-card .meta-line,
+.theme-light .meta-line,
+.theme-light .small-muted {
+  color: #526976;
+}
+
 button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 
 /* Layout alignment: the outer section owns the background; its inner container owns the grid. */
