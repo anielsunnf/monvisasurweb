@@ -668,7 +668,38 @@ select {
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1rem;
+  gap: 1.5rem;
+}
+
+.service-card {
+  overflow: hidden;
+}
+
+.service-card-image {
+  width: calc(100% + 2.2rem);
+  height: 13rem;
+  margin: -1rem -1.1rem 1.25rem;
+  object-fit: cover;
+}
+
+.service-card-content {
+  display: flex;
+  min-height: 19rem;
+  flex-direction: column;
+}
+
+.service-card-content h3 {
+  margin-top: 0.8rem;
+  font-size: 1.45rem;
+}
+
+.service-card-content .small-muted {
+  line-height: 1.65;
+}
+
+.service-card-content .meta-line {
+  margin-top: auto !important;
+  padding-top: 1rem;
 }
 
 .card,
@@ -1399,6 +1430,16 @@ textarea:focus {
   .travel-help-card {
     border-radius: 0.9rem;
     padding: 0.85rem;
+  }
+
+  .service-card-image {
+    width: calc(100% + 1.7rem);
+    height: 11rem;
+    margin: -0.85rem -0.85rem 1rem;
+  }
+
+  .service-card-content {
+    min-height: 0;
   }
 
   .tab-row {
