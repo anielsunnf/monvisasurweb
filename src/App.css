@@ -576,7 +576,7 @@ select {
 .hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(105deg, rgba(232, 246, 246, 0.97) 0%, rgba(232, 246, 246, 0.88) 48%, rgba(15, 75, 83, 0.82) 100%), url('./api/OIP (1).webp') center / cover;
+  background: linear-gradient(105deg, rgba(232, 246, 246, 0.96) 0%, rgba(232, 246, 246, 0.78) 48%, rgba(15, 75, 83, 0.36) 100%), url('/hero-travel.webp') center / cover;
   border: 0;
   border-radius: 0;
   padding: clamp(3rem, 8vw, 7rem) 0;
@@ -1219,7 +1219,7 @@ body,
 .hero,
 .section-alt,
 .travel-page {
-  background: linear-gradient(rgba(7, 19, 29, 0.88), rgba(7, 19, 29, 0.94)), url('./api/OIP (1).webp') center / cover fixed;
+  background: linear-gradient(rgba(7, 19, 29, 0.84), rgba(7, 19, 29, 0.9)), url('/hero-travel.webp') center / cover fixed;
   border-color: var(--line);
 }
 
@@ -1603,7 +1603,8 @@ textarea:focus {
 .theme-light .btn-primary:hover, .theme-light .btn-primary:focus-visible { background: #06665f; }
 .theme-light .btn-secondary { background: #e8f1f3; color: #075d58; border-color: #b7d1d5; }
 .theme-light .btn-ghost { background: transparent; color: #17313b; border-color: #789aa2; }
-.theme-light .hero, .theme-light .section-alt, .theme-light .travel-page { background: linear-gradient(rgb(255 255 255 / 94%), rgb(242 248 249 / 94%)); border-color: #cbdde1; }
+.theme-light .hero { background: linear-gradient(105deg, rgba(232, 246, 246, 0.96) 0%, rgba(232, 246, 246, 0.78) 48%, rgba(15, 75, 83, 0.36) 100%), url('/hero-travel.webp') center / cover; border-color: #cbdde1; }
+.theme-light .section-alt, .theme-light .travel-page { background: linear-gradient(rgb(255 255 255 / 94%), rgb(242 248 249 / 94%)); border-color: #cbdde1; }
 .theme-light .travel-banner { background: #0b3b46; color: #fff; }
 .theme-light .travel-banner h1 { color: #fff; }
 .theme-light .travel-banner p { color: #e3f1f3; }
@@ -1787,7 +1788,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outlin
 
 .editorial-image {
   min-height: 27rem;
-  background: linear-gradient(135deg, rgba(8, 87, 91, 0.08), rgba(8, 87, 91, 0.26)), url('./api/OIP (1).webp') center / cover;
+  background: linear-gradient(135deg, rgba(8, 87, 91, 0.08), rgba(8, 87, 91, 0.26)), url('/hero-travel.webp') center / cover;
   border-radius: 0 7rem 0 7rem;
   box-shadow: 1.5rem 1.5rem 0 #d9eceb;
   animation: image-drift 12s ease-in-out infinite alternate;
