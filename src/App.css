@@ -680,6 +680,15 @@ select {
   height: 13rem;
   margin: -1rem -1.1rem 1.25rem;
   object-fit: cover;
+  transform: scale(1.02);
+  animation: image-reveal 0.8s ease-out both;
+  transition: transform 0.6s ease, filter 0.6s ease;
+}
+
+.service-card:hover .service-card-image,
+.service-card:focus-within .service-card-image {
+  transform: scale(1.08);
+  filter: saturate(1.08) contrast(1.03);
 }
 
 .service-card-content {
@@ -1760,6 +1769,12 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outlin
   background: linear-gradient(135deg, rgba(8, 87, 91, 0.08), rgba(8, 87, 91, 0.26)), url('./api/OIP (1).webp') center / cover;
   border-radius: 0 7rem 0 7rem;
   box-shadow: 1.5rem 1.5rem 0 #d9eceb;
+  animation: image-drift 12s ease-in-out infinite alternate;
+  transition: transform 0.7s ease;
+}
+
+.editorial-image:hover {
+  transform: translateY(-0.35rem) scale(1.015);
 }
 
 .editorial-copy {
@@ -1854,6 +1869,15 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outlin
   width: 100%;
   aspect-ratio: 1.45;
   object-fit: cover;
+  transform: scale(1.02);
+  animation: image-reveal 0.8s ease-out both;
+  transition: transform 0.6s ease, filter 0.6s ease;
+}
+
+.destination-card:hover img,
+.destination-card:focus-within img {
+  transform: scale(1.08);
+  filter: saturate(1.08) contrast(1.03);
 }
 
 .destination-card-body {
@@ -1885,6 +1909,44 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outlin
 .destination-link:hover,
 .destination-link:focus-visible {
   text-decoration: underline;
+}
+
+.service-card:nth-child(2) .service-card-image,
+.destination-card:nth-child(2) img {
+  animation-delay: 0.12s;
+}
+
+.service-card:nth-child(3) .service-card-image,
+.destination-card:nth-child(3) img {
+  animation-delay: 0.24s;
+}
+
+@keyframes image-reveal {
+  from { opacity: 0; transform: scale(1.1); }
+  to { opacity: 1; transform: scale(1.02); }
+}
+
+@keyframes image-drift {
+  from { background-position: 45% 50%; }
+  to { background-position: 55% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card-image,
+  .destination-card img,
+  .editorial-image {
+    animation: none;
+    transition: none;
+  }
+
+  .service-card:hover .service-card-image,
+  .service-card:focus-within .service-card-image,
+  .destination-card:hover img,
+  .destination-card:focus-within img,
+  .editorial-image:hover {
+    transform: none;
+    filter: none;
+  }
 }
 
 /* Decorative separators are intentionally omitted across the application. */
