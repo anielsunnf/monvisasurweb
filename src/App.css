@@ -1855,6 +1855,20 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outlin
   max-width: 48rem;
 }
 
+.catalogue-page .section-header {
+  margin-bottom: 0.75rem;
+}
+
+.catalogue-page .page-intro-band {
+  margin-top: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 0;
+}
+
+.catalogue-page .page-intro-band h2 {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+}
+
 .destination-section {
   background: #edf5f3;
   padding-top: clamp(3rem, 7vw, 6rem);

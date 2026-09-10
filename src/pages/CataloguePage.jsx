@@ -51,7 +51,7 @@ export function CataloguePage() {
   }
 
   return (
-    <main className="container page">
+    <main className="container page catalogue-page">
       <div className="section-header">
         <div>
           <span className="eyebrow">{t('catalogue.eyebrow')}</span>
