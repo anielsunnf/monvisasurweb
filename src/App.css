@@ -931,6 +931,25 @@ textarea:focus {
   line-height: 1.7;
 }
 
+.forgot-password-link {
+  justify-self: start;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.forgot-password-link:hover,
+.forgot-password-link:focus-visible {
+  text-decoration: underline;
+}
+
+.reset-back {
+  width: 100%;
+}
+
 .auth-intro {
   max-width: 34rem;
   margin: 1rem 0 0;

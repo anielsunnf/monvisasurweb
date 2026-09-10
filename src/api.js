@@ -229,6 +229,15 @@ export function loginUser({ email, password, role }) {
     : Promise.reject(new Error('Email, mot de passe ou profil incorrect.'))
 }
 
+export function resetPassword({ email, password }) {
+  const normalizedEmail = email.trim().toLowerCase()
+  const user = userStore.find(candidate => candidate.email === normalizedEmail)
+  if (!user) return Promise.reject(new Error('Aucun compte ne correspond à cette adresse email.'))
+  userStore = userStore.map(candidate => candidate.email === normalizedEmail ? { ...candidate, password } : candidate)
+  saveStore(USER_STORAGE_KEY, userStore)
+  return Promise.resolve()
+}
+
 export function createOrder(order) {
   const journey = journeyStore.find(candidate => candidate.id === order.journeyId)
   const passengerCount = order.passengers?.length || 0

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { loginUser, registerUser } from '../api'
+import { loginUser, registerUser, resetPassword } from '../api'
 import { useI18n } from '../components/useI18n'
 import { useTranslation } from 'react-i18next'
 import { Toast } from '../components/Toast'
@@ -30,7 +30,7 @@ export function LoginPage({ user, setUser }) {
 		else if (!/^\S+@\S+\.\S+$/.test(form.email)) nextErrors.email = 'Saisissez une adresse email valide.'
 		if (!form.password) nextErrors.password = 'Le mot de passe est requis.'
 		else if (form.password.length < 6) nextErrors.password = 'Le mot de passe doit contenir au moins 6 caractères.'
-		if (!form.role) nextErrors.role = 'Sélectionnez un profil.'
+		if (mode !== 'forgot' && !form.role) nextErrors.role = 'Sélectionnez un profil.'
 		if (Object.keys(nextErrors).length > 0) {
 			setErrors(nextErrors)
 			return
@@ -40,6 +40,13 @@ export function LoginPage({ user, setUser }) {
 		setSubmitError('')
 		setIsSubmitting(true)
 		try {
+			if (mode === 'forgot') {
+				await resetPassword({ email: form.email, password: form.password })
+				setMode('login')
+				setForm(current => ({ ...current, password: '', role: '' }))
+				setToast({ type: 'success', message: translate('login.reset_success') })
+				return
+			}
 			const account = mode === 'register'
 				? await registerUser({ ...form, role: 'client', email: form.email.trim() })
 				: await loginUser({ email: form.email.trim(), password: form.password, role: form.role })
@@ -70,11 +77,12 @@ export function LoginPage({ user, setUser }) {
 				</aside>
 
 				<section className="panel">
-					<div className="tab-row" aria-label="Mode d'accès">
+					{mode !== 'forgot' && <div className="tab-row" aria-label="Mode d'accès">
 						<button type="button" disabled={isSubmitting} className={`tab ${mode === 'login' ? 'active' : ''}`} onClick={() => { setMode('login'); setErrors({}); setSubmitError('') }}>{t('login')}</button>
 						<button type="button" disabled={isSubmitting} className={`tab ${mode === 'register' ? 'active' : ''}`} onClick={() => { setMode('register'); setForm(current => ({ ...current, role: 'client' })); setErrors({}); setSubmitError('') }}>{t('register')}</button>
-					</div>
-					<h2>{mode === 'login' ? t('login') : t('create')}</h2>
+					</div>}
+					<h2>{mode === 'forgot' ? translate('login.reset_title') : mode === 'login' ? t('login') : t('create')}</h2>
+					{mode === 'forgot' && <p className="small-muted">{translate('login.reset_description')}</p>}
 					{submitError && <div className="alert alert-error" role="alert">{submitError}</div>}
 					<form className="form-grid" onSubmit={handleSubmit} noValidate>
 						{mode === 'register' && <div className="field full">
@@ -111,9 +119,11 @@ export function LoginPage({ user, setUser }) {
 							</select>
 							{errors.role && <span className="field-error">{errors.role}</span>}
 						</div>}
+						{mode === 'login' && <button type="button" className="forgot-password-link" onClick={() => { setMode('forgot'); setErrors({}); setSubmitError('') }}>{translate('login.forgot_password')}</button>}
 						<div className="field full">
-							<button type="submit" className="btn btn-primary" disabled={isSubmitting}>{isSubmitting && <span className="button-loader" aria-hidden="true" />}{isSubmitting ? translate('feedback.logging_in') : t('submit')}</button>
+							<button type="submit" className="btn btn-primary" disabled={isSubmitting}>{isSubmitting && <span className="button-loader" aria-hidden="true" />}{isSubmitting ? translate('feedback.logging_in') : mode === 'forgot' ? translate('login.reset_submit') : t('submit')}</button>
 						</div>
+						{mode === 'forgot' && <button type="button" className="btn btn-ghost reset-back" onClick={() => { setMode('login'); setErrors({}); setSubmitError('') }}>{translate('login.back_to_login')}</button>}
 					</form>
 				</section>
 			</div>
