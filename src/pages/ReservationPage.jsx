@@ -19,6 +19,7 @@ export function ReservationPage({ user }) {
   const [confirmed, setConfirmed] = useState(false)
   const [confirmedOrder, setConfirmedOrder] = useState(null)
   const [submitError, setSubmitError] = useState('')
+  const totalPrice = journey ? journey.price * passengerCount : 0
 
   useEffect(() => {
     getJourneyById(id).then(setJourney).finally(() => setLoading(false))
@@ -56,7 +57,7 @@ export function ReservationPage({ user }) {
         journeyId: journey.id,
         route: `${journey.from} → ${journey.to}`,
         passengers: passengers.map(passenger => ({ name: passenger.name.trim(), document: passenger.document.name })),
-        total: journey.price * passengerCount,
+        total: totalPrice,
         currency: journey.currency,
         journey,
         selectedDate,
@@ -93,7 +94,11 @@ export function ReservationPage({ user }) {
           <p><strong>{journey.from} → {journey.to}</strong></p>
           <p className="small-muted">{selectedDate || journey.date} · {journey.departure} - {journey.arrival}</p>
           <p className="small-muted">{journey.transport} · {journey.duration}</p>
-          <div className="meta-line"><span>{passengerCount} {passengerCount > 1 ? t('ui.passengers') : t('ui.passenger')}</span><strong>{(journey.price * passengerCount).toLocaleString()} {journey.currency}</strong></div>
+          <div className="price-breakdown">
+            <div><span>Prix unitaire</span><strong>{journey.price.toLocaleString()} {journey.currency}</strong></div>
+            <div><span>Nombre de places</span><strong>× {passengerCount}</strong></div>
+            <div className="price-total"><span>Total à payer</span><strong>{totalPrice.toLocaleString()} {journey.currency}</strong></div>
+          </div>
         </aside>
       </div>
     </main>

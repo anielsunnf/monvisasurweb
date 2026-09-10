@@ -81,11 +81,8 @@ export function CataloguePage() {
                 ))}
               </ul>
               <div className="card-actions">
-                <NavLink to={`/catalogue/${service.id}`} className="btn btn-ghost">
-                  {t('details')}
-                </NavLink>
-                <NavLink to="/login" className="btn btn-primary">
-                  {t('newCase')}
+                <NavLink to={`/catalogue/${service.id}`} className="btn btn-primary">
+                  En savoir plus
                 </NavLink>
               </div>
             </article>

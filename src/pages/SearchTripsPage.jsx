@@ -149,8 +149,11 @@ export function SearchTripsPage() {
               aria-invalid={Boolean(errors.date)}
             />
             {errors.date && <span className="field-error">{errors.date}</span>}
-            {availableDates.length > 0 && <div className="city-options date-options" aria-label="Dates disponibles">
-              {availableDates.map(date => <button key={date} type="button" className={`city-option ${form.date === date ? 'selected' : ''}`} onClick={() => setForm(current => ({ ...current, date }))}>{new Date(`${date}T00:00:00`).toLocaleDateString('fr-FR')}</button>)}
+            {availableDates.length > 0 && <div className="available-dates" aria-label="Dates disponibles pour ce créneau">
+              <span className="available-dates-label">Dates disponibles pour ce trajet</span>
+              <div className="city-options date-options">
+                {availableDates.map(date => <a key={date} href="#date" className={`city-option ${form.date === date ? 'selected' : ''}`} onClick={() => setForm(current => ({ ...current, date }))}>{new Date(`${date}T00:00:00`).toLocaleDateString('fr-FR')}</a>)}
+              </div>
             </div>}
           </div>
 

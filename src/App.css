@@ -1,8 +1,6 @@
 .app-shell {
   min-height: 100vh;
-  background:
-    linear-gradient(rgba(243, 244, 246, 0.58), rgba(243, 244, 246, 0.72)),
-    url('./api/OIP (1).webp') center / cover fixed;
+  background: #f4f7f8;
   color: #111827;
 }
 
@@ -456,6 +454,53 @@ select {
 
 .travel-results {
   margin-top: 2rem;
+}
+
+.available-dates {
+  margin-top: 0.55rem;
+  padding: 0.7rem;
+  border-left: 3px solid var(--accent, #19d3ae);
+  background: var(--surface-raised, #e8f1f3);
+}
+
+.available-dates-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--text, #10212b);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.price-breakdown {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.price-breakdown > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--muted);
+}
+
+.price-breakdown strong {
+  color: var(--text);
+}
+
+.price-breakdown .price-total {
+  margin-top: 0.25rem;
+  padding-top: 0.8rem;
+  border-top: 2px solid var(--accent);
+  color: var(--text);
+  font-size: 1.05rem;
+}
+
+.price-breakdown .price-total strong {
+  color: var(--accent);
+  font-size: 1.25rem;
 }
 
 .filter-bar {
@@ -1051,7 +1096,7 @@ body,
 }
 
 .app-shell {
-  background: linear-gradient(rgba(7, 19, 29, 0.92), rgba(7, 19, 29, 0.96)), url('./api/OIP (1).webp') center / cover fixed;
+  background: #f4f7f8;
 }
 
 .header {
@@ -1471,7 +1516,7 @@ textarea:focus {
 
 /* Light theme must override the dark visual system declared above. */
 .theme-light { color-scheme: light; }
-.theme-light.app-shell { background: linear-gradient(rgb(244 247 248 / 92%), rgb(244 247 248 / 96%)), url('./api/OIP (1).webp') center / cover fixed; }
+.theme-light.app-shell { background: #f4f7f8; }
 .theme-light .header { background: rgb(255 255 255 / 96%); border-bottom-color: #cbdde1; }
 .theme-light .brand { color: #0c776f; }
 .theme-light .nav-link { color: #31505d; }
