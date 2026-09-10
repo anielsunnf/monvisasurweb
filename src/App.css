@@ -1841,6 +1841,165 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outlin
   text-decoration: underline;
 }
 
+/* Final contrast contract for every shared surface. */
+.theme-light {
+  --page-bg: #f4f7f8;
+  --surface: #ffffff;
+  --surface-raised: #e8f1f3;
+  --line: #b7d1d5;
+  --text: #10212b;
+  --muted: #526976;
+}
+
+.theme-light,
+.theme-light body,
+.theme-light .app-shell,
+.theme-light .page,
+.theme-light .travel-page {
+  background-color: var(--page-bg);
+  color: var(--text);
+}
+
+.theme-light .card,
+.theme-light .panel,
+.theme-light .summary-box,
+.theme-light .list-card,
+.theme-light .ticket-card,
+.theme-light .travel-search-card,
+.theme-light .travel-help-card,
+.theme-light .success-state,
+.theme-light .empty-state,
+.theme-light .destination-card {
+  background-color: var(--surface);
+  color: var(--text);
+  border-color: var(--line);
+}
+
+.theme-light .card h1,
+.theme-light .card h2,
+.theme-light .card h3,
+.theme-light .panel h1,
+.theme-light .panel h2,
+.theme-light .panel h3,
+.theme-light .summary-box h1,
+.theme-light .summary-box h2,
+.theme-light .summary-box h3,
+.theme-light .list-card strong,
+.theme-light .ticket-card h1,
+.theme-light .success-state h1,
+.theme-light .success-state h2,
+.theme-light .section-title,
+.theme-light .page-intro-band h2,
+.theme-light .editorial-copy h2,
+.theme-light .destination-card h3 {
+  color: var(--text);
+}
+
+.theme-light .card p,
+.theme-light .panel p,
+.theme-light .summary-box p,
+.theme-light .ticket-card p,
+.theme-light .success-state p,
+.theme-light .list-card .meta-line,
+.theme-light .small-muted,
+.theme-light .lead,
+.theme-light .editorial-copy p,
+.theme-light .page-intro-band p,
+.theme-light .destination-card p {
+  color: var(--muted);
+}
+
+.theme-light input,
+.theme-light select,
+.theme-light textarea {
+  background: #ffffff;
+  color: var(--text);
+  border-color: #9db9bf;
+}
+
+.theme-light input::placeholder,
+.theme-light textarea::placeholder {
+  color: #647982;
+}
+
+.theme-light .price,
+.theme-light .metric strong {
+  color: #075d58;
+}
+
+.theme-light .city-option,
+.theme-light .destination-link,
+.theme-light .editorial-points strong {
+  color: #075d58;
+}
+
+.theme-dark {
+  --page-bg: #07131d;
+  --surface: #0d1e2a;
+  --surface-raised: #102634;
+  --line: #1c3544;
+  --text: #f4f8fa;
+  --muted: #b2c2cc;
+}
+
+.theme-dark,
+.theme-dark body,
+.theme-dark .app-shell,
+.theme-dark .page,
+.theme-dark .travel-page {
+  background-color: var(--page-bg);
+  color: var(--text);
+}
+
+.theme-dark .card,
+.theme-dark .panel,
+.theme-dark .summary-box,
+.theme-dark .list-card,
+.theme-dark .ticket-card,
+.theme-dark .travel-search-card,
+.theme-dark .travel-help-card,
+.theme-dark .success-state,
+.theme-dark .empty-state,
+.theme-dark .destination-card {
+  background-color: var(--surface);
+  color: var(--text);
+  border-color: var(--line);
+}
+
+.theme-dark .card h1,
+.theme-dark .card h2,
+.theme-dark .card h3,
+.theme-dark .panel h1,
+.theme-dark .panel h2,
+.theme-dark .panel h3,
+.theme-dark .summary-box h1,
+.theme-dark .summary-box h2,
+.theme-dark .summary-box h3,
+.theme-dark .list-card strong,
+.theme-dark .ticket-card h1,
+.theme-dark .success-state h1,
+.theme-dark .success-state h2,
+.theme-dark .section-title,
+.theme-dark .page-intro-band h2,
+.theme-dark .editorial-copy h2,
+.theme-dark .destination-card h3 {
+  color: var(--text);
+}
+
+.theme-dark .card p,
+.theme-dark .panel p,
+.theme-dark .summary-box p,
+.theme-dark .ticket-card p,
+.theme-dark .success-state p,
+.theme-dark .list-card .meta-line,
+.theme-dark .small-muted,
+.theme-dark .lead,
+.theme-dark .editorial-copy p,
+.theme-dark .page-intro-band p,
+.theme-dark .destination-card p {
+  color: var(--muted);
+}
+
 .hero-text { text-align: left; }
 .hero-text .lead { margin-left: 0; }
 
