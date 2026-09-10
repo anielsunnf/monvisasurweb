@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 190" role="img" aria-labelledby="title">
+  <title id="title">Monvisasur</title>
+  <g fill="none" stroke="#72bf44" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke-width="8" d="M260 72c-2-25-1-42 3-58"/>
+    <path fill="#72bf44" stroke-width="3" d="M263 54C226 39 211 19 216 2c29 3 48 20 47 52Z"/>
+    <path fill="#4aab45" stroke-width="3" d="M268 50C278 18 299 1 325 0c-2 27-18 47-57 54Z"/>
+  </g>
+  <text x="260" y="150" fill="#145b59" font-family="Georgia, serif" font-size="58" font-weight="700" text-anchor="middle">Monvisasur</text>
+</svg>

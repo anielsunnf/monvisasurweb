@@ -117,8 +117,9 @@
 
 .footer-brand {
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.35rem;
   color: var(--accent, #19d3ae);
   text-decoration: none;
   width: fit-content;
@@ -149,6 +150,13 @@
   margin-top: 0.2rem;
   color: #78909d;
   font-size: 0.75rem;
+}
+
+.footer-logo {
+  width: 9rem;
+  height: 3.2rem;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
 }
 
 .footer-copy {
@@ -203,6 +211,12 @@
   background: #f8d36d;
   color: #0b3b46;
   font-weight: 900;
+}
+
+.brand-logo {
+  width: 10.5rem;
+  height: 3rem;
+  object-fit: contain;
 }
 
 .main-nav {
@@ -1360,6 +1374,11 @@ textarea:focus {
 
   .topbar .brand {
     min-width: max-content;
+  }
+
+  .brand-logo {
+    width: 8.5rem;
+    height: 2.6rem;
   }
 
   .topbar .header-actions {

@@ -8,7 +8,7 @@ export function Header({ user, onLogout, theme, onThemeChange }) {
 
   return <header className="header">
     <div className="container topbar">
-      <NavLink to="/" className="brand" aria-label={`${t('nav.home')} Monvisasur`}><span className="brand-mark">M</span>Monvisasur</NavLink>
+      <NavLink to="/" className="brand" aria-label={`${t('nav.home')} Monvisasur`}><img className="brand-logo" src="/monvisasur-logo.svg" alt="Monvisasur" /></NavLink>
       <nav className="main-nav" aria-label={t('nav.home')}>
         <NavLink to="/" className={navClass}>{t('nav.home')}</NavLink>
         <NavLink to="/catalogue" className={navClass}>{t('nav.catalogue')}</NavLink>
