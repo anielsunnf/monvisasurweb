@@ -684,6 +684,7 @@ select {
 
 .service-card-content {
   display: flex;
+  flex: 1;
   min-height: 19rem;
   flex-direction: column;
 }
@@ -700,6 +701,16 @@ select {
 .service-card-content .meta-line {
   margin-top: auto !important;
   padding-top: 1rem;
+}
+
+.service-card-content .card-actions {
+  min-height: 3.2rem;
+  margin-top: 1rem;
+  align-items: flex-end;
+}
+
+.service-card-content .card-actions .btn {
+  width: fit-content;
 }
 
 .card,
