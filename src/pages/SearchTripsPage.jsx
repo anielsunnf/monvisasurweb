@@ -35,6 +35,7 @@ export function SearchTripsPage() {
     else if (!isKnownCity(form.to)) errs.to = 'Cette ville d’arrivée n’est pas disponible dans nos trajets'
     if (!form.date) errs.date = 'La date est requise'
     if (!form.passengers) errs.passengers = 'Le nombre de passagers est requis'
+    else if (!Number.isInteger(Number(form.passengers)) || Number(form.passengers) < 1) errs.passengers = 'Saisissez un nombre entier de passagers supérieur à zéro'
     return errs
   }
 
@@ -145,17 +146,19 @@ export function SearchTripsPage() {
 
           <div className="field">
             <label htmlFor="passengers">{t('search.passengers')}</label>
-            <select
+            <input
               id="passengers"
+              type="number"
+              min="1"
+              max="99"
+              step="1"
+              inputMode="numeric"
+              placeholder="Ex : 1"
               value={form.passengers}
               onChange={e => setForm(f => ({ ...f, passengers: e.target.value }))}
               className={errors.passengers ? 'input-error' : ''}
-            >
-              <option value="">{t('common.select')} {t('search.passengers').toLowerCase()}</option>
-              {[1, 2, 3, 4, 5].map(n => (
-                <option key={n} value={n}>{n} {n > 1 ? t('ui.passengers') : t('ui.passenger')}</option>
-              ))}
-            </select>
+              aria-invalid={Boolean(errors.passengers)}
+            />
             {errors.passengers && <span className="field-error">{errors.passengers}</span>}
           </div>
 
