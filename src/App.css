@@ -237,6 +237,30 @@
   gap: 0.75rem;
 }
 
+.history-controls {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.history-button {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 0.65rem;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.history-button:hover,
+.history-button:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  outline: 2px solid #f8d36d;
+  outline-offset: 1px;
+}
+
 .button,
 button,
 input,
@@ -371,6 +395,32 @@ select {
   width: 100%;
   border-radius: 0.15rem;
   background: #176c80;
+}
+
+.city-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+}
+
+.city-option {
+  border: 1px solid #a7c7ce;
+  border-radius: 999px;
+  padding: 0.28rem 0.62rem;
+  background: #f2f8f9;
+  color: #0b5964;
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+
+.city-option:hover,
+.city-option:focus-visible,
+.city-option.selected {
+  border-color: #087f75;
+  background: #dff5ef;
+  color: #075b54;
+  outline: none;
 }
 
 .travel-help-card {
@@ -1199,15 +1249,16 @@ textarea:focus {
   }
 
   .topbar {
-    flex-wrap: wrap;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    flex-wrap: nowrap;
     align-items: center;
     padding-top: 0.75rem;
     padding-bottom: 0.75rem;
   }
 
   .topbar .brand {
-    flex: 1 1 auto;
+    min-width: max-content;
   }
 
   .topbar .header-actions {
@@ -1217,6 +1268,7 @@ textarea:focus {
 
   .topbar .main-nav {
     order: 3;
+    grid-column: 1 / -1;
     width: 100%;
     justify-content: center;
   }
@@ -1270,6 +1322,38 @@ textarea:focus {
   .nav-link {
     flex: 1;
     text-align: center;
+  }
+}
+
+@media (max-width: 520px) {
+  .topbar {
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+  }
+
+  .topbar .header-actions {
+    width: 100%;
+    justify-content: space-between;
+    margin-left: 0;
+  }
+
+  .topbar .main-nav {
+    gap: 0.2rem;
+  }
+
+  .nav-link {
+    padding: 0.45rem 0.3rem;
+    font-size: 0.86rem;
+  }
+
+  .topbar .user-name,
+  .topbar .role-badge {
+    display: none;
+  }
+
+  .lang-btn {
+    padding: 0.55rem 0.65rem;
+    font-size: 0.8rem;
   }
 }
 

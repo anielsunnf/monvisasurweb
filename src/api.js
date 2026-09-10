@@ -95,6 +95,10 @@ export function getJourneyById(id) {
   return Promise.resolve(journeyStore.find(journey => journey.id === id) ?? null)
 }
 
+export function getAvailableJourneyCities() {
+  return [...new Set(journeyStore.flatMap(journey => [journey.from, journey.to]))].sort((a, b) => a.localeCompare(b))
+}
+
 export function searchJourneys(criteria) {
   const from = normalizeCity(criteria.from)
   const to = normalizeCity(criteria.to)

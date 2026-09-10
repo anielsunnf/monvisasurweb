@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { getReservationWindow, searchJourneys } from '../api'
+import { getAvailableJourneyCities, getReservationWindow, searchJourneys } from '../api'
 import { FilterBar } from '../components/FilterBar'
 import { useI18n } from '../components/useI18n'
 
 export function SearchTripsPage() {
   const { t } = useI18n()
   const reservationWindow = getReservationWindow()
+  const availableCities = getAvailableJourneyCities()
   const [form, setForm] = useState({ from: '', to: '', date: '', passengers: '' })
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
@@ -16,11 +17,22 @@ export function SearchTripsPage() {
   const [sortBy, setSortBy] = useState('')
   const [filterType, setFilterType] = useState('')
   const [carrier, setCarrier] = useState('')
+  const [activeCityField, setActiveCityField] = useState('from')
+
+  function normalizeCity(value) {
+    return value.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  }
+
+  function isKnownCity(value) {
+    return availableCities.some(city => normalizeCity(city) === normalizeCity(value))
+  }
 
   function validate() {
     const errs = {}
     if (!form.from.trim()) errs.from = 'La ville de départ est requise'
+    else if (!isKnownCity(form.from)) errs.from = 'Cette ville de départ n’est pas disponible dans nos trajets'
     if (!form.to.trim()) errs.to = 'La ville d\'arrivée est requise'
+    else if (!isKnownCity(form.to)) errs.to = 'Cette ville d’arrivée n’est pas disponible dans nos trajets'
     if (!form.date) errs.date = 'La date est requise'
     if (!form.passengers) errs.passengers = 'Le nombre de passagers est requis'
     return errs
@@ -45,6 +57,11 @@ export function SearchTripsPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  function selectCity(city, field = activeCityField) {
+    setForm(current => ({ ...current, [field]: city }))
+    setErrors(current => ({ ...current, [field]: '' }))
   }
 
   const filtered = results
@@ -82,10 +99,16 @@ export function SearchTripsPage() {
               id="from"
               placeholder="Ex : Yaoundé"
               value={form.from}
+              list="available-cities"
+              onFocus={() => setActiveCityField('from')}
               onChange={e => setForm(f => ({ ...f, from: e.target.value }))}
               className={errors.from ? 'input-error' : ''}
+              aria-invalid={Boolean(errors.from)}
             />
             {errors.from && <span className="field-error">{errors.from}</span>}
+            <div className="city-options" aria-label="Villes de départ disponibles">
+              {availableCities.map(city => <button key={`from-${city}`} type="button" className={`city-option ${form.from === city ? 'selected' : ''}`} onClick={() => selectCity(city, 'from')}>{city}</button>)}
+            </div>
           </div>
 
           <div className="field">
@@ -94,10 +117,16 @@ export function SearchTripsPage() {
               id="to"
               placeholder="Ex : Douala"
               value={form.to}
+              list="available-cities"
+              onFocus={() => setActiveCityField('to')}
               onChange={e => setForm(f => ({ ...f, to: e.target.value }))}
               className={errors.to ? 'input-error' : ''}
+              aria-invalid={Boolean(errors.to)}
             />
             {errors.to && <span className="field-error">{errors.to}</span>}
+            <div className="city-options" aria-label="Villes d’arrivée disponibles">
+              {availableCities.map(city => <button key={`to-${city}`} type="button" className={`city-option ${form.to === city ? 'selected' : ''}`} onClick={() => selectCity(city, 'to')}>{city}</button>)}
+            </div>
           </div>
 
           <div className="field">
@@ -141,6 +170,7 @@ export function SearchTripsPage() {
             </button>
           </div>
         </div>
+        <datalist id="available-cities">{availableCities.map(city => <option key={city} value={city} />)}</datalist>
         </section>
 
         <aside className="travel-help-card">
