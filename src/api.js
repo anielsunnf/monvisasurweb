@@ -349,6 +349,10 @@ export function getAdvisors() {
     .map(({ password: _password, ...user }) => user))
 }
 
+export function getAllUsers() {
+  return Promise.resolve(userStore.map(({ password: _password, ...user }) => user))
+}
+
 export function assignDossierAdvisor(id, advisorId) {
   dossierStore = dossierStore.map(dossier => dossier.id === id ? { ...dossier, advisorId } : dossier)
   persistDossiers()

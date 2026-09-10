@@ -18,6 +18,7 @@ import { NotificationsPage } from './pages/client/NotificationsPage'
 import { AdminDashboard } from './pages/admin/AdminDashboard'
 import { CatalogueManagementPage } from './pages/admin/CatalogueManagementPage'
 import { TripsManagementPage } from './pages/admin/TripsManagementPage'
+import { UsersManagementPage } from './pages/admin/UsersManagementPage'
 import './App.css'
 
 function App() {
@@ -82,6 +83,7 @@ function App() {
         } />
         <Route path="/admin/catalogue" element={<ProtectedRoute user={user} requiredRole="admin"><CatalogueManagementPage /></ProtectedRoute>} />
         <Route path="/admin/trajets" element={<ProtectedRoute user={user} requiredRole="admin"><TripsManagementPage /></ProtectedRoute>} />
+        <Route path="/admin/utilisateurs" element={<ProtectedRoute user={user} requiredRole="admin"><UsersManagementPage /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Footer />

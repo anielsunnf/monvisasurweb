@@ -60,7 +60,7 @@ export function AdminDashboard({ user }) {
   return (
     <main className="container page">
       <div className="section-header"><div><span className="eyebrow">{t('ui.backoffice')}</span><h1 className="section-title">{user.role === 'advisor' ? t('ui.assigned_files') : t('ui.admin_title')}</h1></div></div>
-      {user.role === 'admin' && <div className="card-actions"><NavLink to="/admin/catalogue" className="btn btn-secondary">{t('ui.manage_catalogue')}</NavLink><NavLink to="/admin/trajets" className="btn btn-secondary">{t('ui.manage_trips')}</NavLink></div>}
+      {user.role === 'admin' && <div className="card-actions"><NavLink to="/admin/catalogue" className="btn btn-secondary">{t('ui.manage_catalogue')}</NavLink><NavLink to="/admin/trajets" className="btn btn-secondary">{t('ui.manage_trips')}</NavLink><NavLink to="/admin/utilisateurs" className="btn btn-secondary">Gérer les utilisateurs</NavLink></div>}
       <div className="grid-3" style={{ marginBottom: '1rem' }}>
         <div className="metric"><strong>{counts.total}</strong><span>{t('ui.total_files')}</span></div>
         <div className="metric"><strong>{counts.current}</strong><span>{t('ui.current_files')}</span></div>
