@@ -2019,6 +2019,96 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outlin
   color: var(--muted);
 }
 
+.theme-dark .header {
+  background: #07131d;
+  color: #f4f8fa;
+}
+
+.theme-dark .brand,
+.theme-dark .nav-link,
+.theme-dark .lang-btn,
+.theme-dark .theme-toggle,
+.theme-dark .btn-ghost {
+  color: #f4f8fa;
+}
+
+.theme-dark .nav-link.active,
+.theme-dark .nav-link:hover,
+.theme-dark .nav-link:focus-visible,
+.theme-dark .lang-btn:hover,
+.theme-dark .lang-btn:focus-visible {
+  background: #102634;
+  color: #ffffff;
+}
+
+.theme-dark .lang-btn,
+.theme-dark .theme-toggle,
+.theme-dark .btn-ghost {
+  border-color: #426070;
+}
+
+.theme-dark .lang-dropdown {
+  background: #0d1e2a;
+  border-color: #426070;
+}
+
+.theme-dark .lang-option {
+  color: #f4f8fa;
+}
+
+.theme-dark .lang-option:hover,
+.theme-dark .lang-option.active {
+  background: #102634;
+  color: #19d3ae;
+}
+
+.theme-dark .btn-secondary,
+.theme-dark .tab {
+  background: #102634;
+  color: #f4f8fa;
+  border-color: #426070;
+}
+
+.theme-dark .btn-primary,
+.theme-dark .tab.active {
+  background: #19d3ae;
+  color: #06141b;
+}
+
+.theme-dark label,
+.theme-dark .available-dates-label,
+.theme-dark .price-breakdown strong {
+  color: #f4f8fa;
+}
+
+.theme-dark input,
+.theme-dark select,
+.theme-dark textarea {
+  background: #091923;
+  color: #f4f8fa;
+  border-color: #426070;
+}
+
+.theme-dark input::placeholder,
+.theme-dark textarea::placeholder {
+  color: #a8bbc5;
+}
+
+.theme-dark .travel-card-heading,
+.theme-dark .available-dates,
+.theme-dark .metric,
+.theme-dark .passenger-form,
+.theme-dark .detail-summary {
+  background: #102634;
+  color: #f4f8fa;
+}
+
+.theme-dark .travel-card-heading h2,
+.theme-dark .travel-help-card h2,
+.theme-dark .modal-header h2 {
+  color: #f4f8fa;
+}
+
 .hero-text { text-align: left; }
 .hero-text .lead { margin-left: 0; }
 
