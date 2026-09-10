@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { getAvailableJourneyCities, getReservationWindow, searchJourneys } from '../api'
+import { getAvailableJourneyCities, getAvailableJourneyDates, getReservationWindow, searchJourneys } from '../api'
 import { FilterBar } from '../components/FilterBar'
 import { useI18n } from '../components/useI18n'
 
 export function SearchTripsPage() {
   const { t } = useI18n()
   const reservationWindow = getReservationWindow()
-  const availableCities = getAvailableJourneyCities()
   const [form, setForm] = useState({ from: '', to: '', date: '', passengers: '' })
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
@@ -18,22 +17,22 @@ export function SearchTripsPage() {
   const [filterType, setFilterType] = useState('')
   const [carrier, setCarrier] = useState('')
   const [activeCityField, setActiveCityField] = useState('from')
+  const availableDepartureCities = getAvailableJourneyCities({ field: 'from', to: form.to })
+  const availableArrivalCities = getAvailableJourneyCities({ field: 'to', from: form.from })
+  const availableDates = getAvailableJourneyDates({ from: form.from, to: form.to })
 
   function normalizeCity(value) {
     return value.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   }
 
-  function isKnownCity(value) {
-    return availableCities.some(city => normalizeCity(city) === normalizeCity(value))
-  }
-
   function validate() {
     const errs = {}
     if (!form.from.trim()) errs.from = 'La ville de départ est requise'
-    else if (!isKnownCity(form.from)) errs.from = 'Cette ville de départ n’est pas disponible dans nos trajets'
+    else if (!isKnownCity(form.from, 'from')) errs.from = 'Cette ville de départ n’est pas disponible dans nos trajets'
     if (!form.to.trim()) errs.to = 'La ville d\'arrivée est requise'
-    else if (!isKnownCity(form.to)) errs.to = 'Cette ville d’arrivée n’est pas disponible dans nos trajets'
+    else if (!isKnownCity(form.to, 'to')) errs.to = 'Cette ville d’arrivée n’est pas disponible dans nos trajets'
     if (!form.date) errs.date = 'La date est requise'
+    else if (!availableDates.includes(form.date)) errs.date = 'Cette date n’est pas disponible pour ce trajet'
     if (!form.passengers) errs.passengers = 'Le nombre de passagers est requis'
     else if (!Number.isInteger(Number(form.passengers)) || Number(form.passengers) < 1) errs.passengers = 'Saisissez un nombre entier de passagers supérieur à zéro'
     return errs
@@ -61,8 +60,13 @@ export function SearchTripsPage() {
   }
 
   function selectCity(city, field = activeCityField) {
-    setForm(current => ({ ...current, [field]: city }))
+    setForm(current => ({ ...current, [field]: city, ...(field === 'from' ? { to: '', date: '' } : { date: '' }) }))
     setErrors(current => ({ ...current, [field]: '' }))
+  }
+
+  function isKnownCity(value, field) {
+    const cities = field === 'from' ? availableDepartureCities : availableArrivalCities
+    return cities.some(city => normalizeCity(city) === normalizeCity(value))
   }
 
   const filtered = results
@@ -108,7 +112,7 @@ export function SearchTripsPage() {
             />
             {errors.from && <span className="field-error">{errors.from}</span>}
             <div className="city-options" aria-label="Villes de départ disponibles">
-              {availableCities.map(city => <button key={`from-${city}`} type="button" className={`city-option ${form.from === city ? 'selected' : ''}`} onClick={() => selectCity(city, 'from')}>{city}</button>)}
+              {availableDepartureCities.map(city => <button key={`from-${city}`} type="button" className={`city-option ${form.from === city ? 'selected' : ''}`} onClick={() => selectCity(city, 'from')}>{city}</button>)}
             </div>
           </div>
 
@@ -126,7 +130,7 @@ export function SearchTripsPage() {
             />
             {errors.to && <span className="field-error">{errors.to}</span>}
             <div className="city-options" aria-label="Villes d’arrivée disponibles">
-              {availableCities.map(city => <button key={`to-${city}`} type="button" className={`city-option ${form.to === city ? 'selected' : ''}`} onClick={() => selectCity(city, 'to')}>{city}</button>)}
+              {availableArrivalCities.map(city => <button key={`to-${city}`} type="button" className={`city-option ${form.to === city ? 'selected' : ''}`} onClick={() => selectCity(city, 'to')}>{city}</button>)}
             </div>
           </div>
 
@@ -140,8 +144,13 @@ export function SearchTripsPage() {
               value={form.date}
               onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
               className={errors.date ? 'input-error' : ''}
+              list="available-dates"
+              aria-invalid={Boolean(errors.date)}
             />
             {errors.date && <span className="field-error">{errors.date}</span>}
+            {availableDates.length > 0 && <div className="city-options date-options" aria-label="Dates disponibles">
+              {availableDates.map(date => <button key={date} type="button" className={`city-option ${form.date === date ? 'selected' : ''}`} onClick={() => setForm(current => ({ ...current, date }))}>{new Date(`${date}T00:00:00`).toLocaleDateString('fr-FR')}</button>)}
+            </div>}
           </div>
 
           <div className="field">
@@ -173,7 +182,8 @@ export function SearchTripsPage() {
             </button>
           </div>
         </div>
-        <datalist id="available-cities">{availableCities.map(city => <option key={city} value={city} />)}</datalist>
+        <datalist id="available-cities">{[...new Set([...availableDepartureCities, ...availableArrivalCities])].map(city => <option key={city} value={city} />)}</datalist>
+        <datalist id="available-dates">{availableDates.map(date => <option key={date} value={date} />)}</datalist>
         </section>
 
         <aside className="travel-help-card">

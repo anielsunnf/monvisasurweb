@@ -95,8 +95,26 @@ export function getJourneyById(id) {
   return Promise.resolve(journeyStore.find(journey => journey.id === id) ?? null)
 }
 
-export function getAvailableJourneyCities() {
-  return [...new Set(journeyStore.flatMap(journey => [journey.from, journey.to]))].sort((a, b) => a.localeCompare(b))
+export function getAvailableJourneyCities(criteria = {}) {
+  const matchingJourneys = journeyStore.filter(journey => (
+    (!criteria.from || normalizeCity(journey.from) === normalizeCity(criteria.from))
+    && (!criteria.to || normalizeCity(journey.to) === normalizeCity(criteria.to))
+  ))
+  const cities = criteria.field === 'from'
+    ? matchingJourneys.map(journey => journey.from)
+    : criteria.field === 'to'
+      ? matchingJourneys.map(journey => journey.to)
+      : journeyStore.flatMap(journey => [journey.from, journey.to])
+  return [...new Set(cities)].sort((a, b) => a.localeCompare(b))
+}
+
+export function getAvailableJourneyDates(criteria = {}) {
+  return [...new Set(journeyStore
+    .filter(journey => (
+      (!criteria.from || normalizeCity(journey.from) === normalizeCity(criteria.from))
+      && (!criteria.to || normalizeCity(journey.to) === normalizeCity(criteria.to))
+    ))
+    .map(journey => journey.date))].sort()
 }
 
 export function searchJourneys(criteria) {
