@@ -1541,6 +1541,20 @@ textarea:focus {
 .theme-light .lang-option:hover { background: #edf7f7; }
 .theme-light .lang-option.active { background: #dff1f0; color: #075d58; }
 .theme-light .site-footer { background: #102a35; color: #d9e7e9; }
+.theme-light .header { color: #10212b; }
+.theme-light .history-button { border-color: #9db9bf; color: #17313b; }
+.theme-light .history-button:hover, .theme-light .history-button:focus-visible { background: #e8f1f3; outline-color: #087f75; }
+.theme-light .travel-card-heading { background: #e8f1f3; color: #10212b; }
+.theme-light .travel-card-heading h2 { color: #10212b; }
+.theme-light .travel-search-card .btn-primary { background: #087f75; color: #fff; }
+.theme-light .travel-help-card .btn { background: #087f75; color: #fff; }
+.theme-light .destination-section { background: #edf5f3; }
+.theme-light .destination-card { background: #fff; border-color: #cbdde1; }
+.theme-light .destination-card h3, .theme-light .editorial-copy h2, .theme-light .page-intro-band h2 { color: #10212b; }
+.theme-light .destination-card p, .theme-light .destination-heading p, .theme-light .editorial-copy p { color: #526976; }
+.theme-light .editorial-points { color: #10212b; }
+.theme-light .available-dates { background: #e8f1f3; }
+.theme-light .available-dates-label { color: #10212b; }
 
 /* Text colors must be explicit because the dark theme is declared earlier. */
 .theme-light .app-shell,
