@@ -60,11 +60,13 @@ export function LoginPage({ user, setUser }) {
 				<aside className="auth-side">
 					<span className="eyebrow" style={{ color: '#f8d36d' }}>{t('login.title')}</span>
 					<h1 style={{ color: 'white', margin: '0.8rem 0' }}>{t('login.title')}</h1>
+					<p className="auth-intro">{t('login.intro')}</p>
 					<ul>
 						<li>{t('home.step2_title')}</li>
 						<li>{t('home.step3_title')}</li>
 						<li>{t('nav.book')}</li>
 					</ul>
+					<p className="auth-trust">{t('login.trust')}</p>
 				</aside>
 
 				<section className="panel">
