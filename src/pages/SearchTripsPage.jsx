@@ -1,13 +1,14 @@
 import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useSearchParams } from 'react-router-dom'
 import { getAvailableJourneyCities, getAvailableJourneyDates, getReservationWindow, searchJourneys } from '../api'
 import { FilterBar } from '../components/FilterBar'
 import { useI18n } from '../components/useI18n'
 
 export function SearchTripsPage() {
   const { t } = useI18n()
+  const [searchParams] = useSearchParams()
   const reservationWindow = getReservationWindow()
-  const [form, setForm] = useState({ from: '', to: '', date: '', passengers: '' })
+  const [form, setForm] = useState(() => ({ from: searchParams.get('from') || '', to: searchParams.get('to') || '', date: '', passengers: '' }))
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)

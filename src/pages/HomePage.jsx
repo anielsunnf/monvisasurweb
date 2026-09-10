@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { getServices } from '../api'
 import { localizeService } from '../data/services'
+import { destinations } from '../data/destinations'
 import { useI18n } from '../components/useI18n'
 
 export function HomePage() {
@@ -117,6 +118,31 @@ export function HomePage() {
             })}
           </div>
         )}
+      </section>
+
+      <section className="destination-section section" aria-labelledby="destinations-title">
+        <div className="container">
+          <div className="section-header destination-heading">
+            <div>
+              <span className="eyebrow">Voyager au Cameroun</span>
+              <h2 id="destinations-title" className="section-title">Des villes qui donnent envie d’avancer.</h2>
+            </div>
+            <p>Préparez votre prochain départ avec des informations simples et un accompagnement qui reste proche de votre réalité.</p>
+          </div>
+          <div className="destination-grid">
+            {destinations.map(destination => (
+              <article className="destination-card" key={destination.city}>
+                <img src={destination.image} alt={destination.alt} loading="lazy" />
+                <div className="destination-card-body">
+                  <span className="eyebrow">{destination.region}</span>
+                  <h3>{destination.city}</h3>
+                  <p>{destination.description}</p>
+                  <NavLink to={`/trajets?to=${encodeURIComponent(destination.city)}`} className="destination-link">Voir les trajets <span aria-hidden="true">→</span></NavLink>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* COMMENT CA MARCHE */}

@@ -1657,6 +1657,75 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outlin
   max-width: 48rem;
 }
 
+.destination-section {
+  background: #edf5f3;
+  padding-top: clamp(3rem, 7vw, 6rem);
+  padding-bottom: clamp(3rem, 7vw, 6rem);
+}
+
+.destination-heading {
+  align-items: end;
+  margin-bottom: 2rem;
+}
+
+.destination-heading p {
+  max-width: 28rem;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.destination-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.destination-card {
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.2rem;
+  box-shadow: 0 16px 32px rgb(16 33 43 / 8%);
+}
+
+.destination-card img {
+  width: 100%;
+  aspect-ratio: 1.45;
+  object-fit: cover;
+}
+
+.destination-card-body {
+  padding: 1.25rem;
+}
+
+.destination-card h3 {
+  margin: 0.35rem 0 0.55rem;
+  color: var(--text);
+  font-size: 1.45rem;
+}
+
+.destination-card p {
+  min-height: 4.5rem;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.destination-link {
+  display: inline-flex;
+  gap: 0.55rem;
+  margin-top: 1rem;
+  color: var(--accent);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.destination-link:hover,
+.destination-link:focus-visible {
+  text-decoration: underline;
+}
+
 .hero-text { text-align: left; }
 .hero-text .lead { margin-left: 0; }
 
@@ -1682,7 +1751,8 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outlin
   .hero { padding: 3.5rem 0 4rem; }
 
   .editorial-intro,
-  .page-intro-band {
+  .page-intro-band,
+  .destination-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1703,5 +1773,13 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outlin
     margin-top: 1.5rem;
     margin-bottom: 2rem;
     padding: 1.5rem 0;
+  }
+
+  .destination-heading {
+    align-items: start;
+  }
+
+  .destination-card p {
+    min-height: 0;
   }
 }
