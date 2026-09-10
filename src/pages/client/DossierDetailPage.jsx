@@ -8,7 +8,7 @@ import { localizeService } from '../../data/services'
 import { useTranslation } from 'react-i18next'
 
 export function DossierDetailPage({ user }) {
-	const { i18n } = useTranslation()
+	const { i18n, t } = useTranslation()
 	const { id } = useParams()
 	const [dossier, setDossier] = useState(null)
 	const [loading, setLoading] = useState(true)
