@@ -51,6 +51,14 @@ export function CataloguePage() {
         </div>
       </div>
 
+      <div className="page-intro-band">
+        <div>
+          <span className="eyebrow">Un accompagnement sur mesure</span>
+          <h2>Du premier document au dernier suivi.</h2>
+        </div>
+        <p>Parcourez nos prestations, comparez les délais et ouvrez votre dossier quand vous êtes prêt. Les informations importantes restent visibles à chaque étape.</p>
+      </div>
+
       {services.length === 0 ? (
         <div className="empty-state">
           <p>{t('common.no_services')}</p>

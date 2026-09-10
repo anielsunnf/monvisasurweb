@@ -58,6 +58,20 @@ export function HomePage() {
         </div>
       </section>
 
+      <section className="editorial-intro container" aria-labelledby="editorial-title">
+        <div className="editorial-image" role="img" aria-label="Accompagnement Monvisasur pour vos projets de mobilité" />
+        <div className="editorial-copy">
+          <span className="eyebrow">Monvisasur</span>
+          <h2 id="editorial-title">Des démarches claires pour avancer sereinement.</h2>
+          <p>Un même espace pour préparer vos documents, suivre vos demandes et organiser vos déplacements. Chaque étape est pensée pour vous laisser le temps de comprendre et d’agir.</p>
+          <div className="editorial-points">
+            <span><strong>01</strong> Choisir la bonne prestation</span>
+            <span><strong>02</strong> Préparer un dossier complet</span>
+            <span><strong>03</strong> Suivre chaque avancée</span>
+          </div>
+        </div>
+      </section>
+
       {/* PRESTATIONS */}
       <section className="section container">
         <div className="section-header">
