@@ -97,13 +97,11 @@
 .header {
   background: #0b3b46;
   color: #f8fbfb;
-  border-bottom: 3px solid #f8d36d;
 }
 
 .site-footer {
   margin-top: auto;
   background: #06141f;
-  border-top: 1px solid #1c3544;
   color: #9bb0bd;
 }
 
@@ -399,7 +397,6 @@ select {
 
 .travel-help-card {
   padding: 1.5rem;
-  border-top: 4px solid #f8d36d;
 }
 
 .travel-help-card h2 {
@@ -423,7 +420,6 @@ select {
   align-items: flex-start;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e9edef;
   color: #263f48;
   font-weight: 700;
 }
@@ -452,7 +448,6 @@ select {
   gap: 0.7rem;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--line);
 }
 
 .price-breakdown > div {
@@ -469,7 +464,6 @@ select {
 .price-breakdown .price-total {
   margin-top: 0.25rem;
   padding-top: 0.8rem;
-  border-top: 2px solid var(--accent);
   color: var(--text);
   font-size: 1.05rem;
 }
@@ -522,8 +516,6 @@ select {
   gap: 1rem;
   margin: 1.5rem 0;
   padding: 1rem 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
 }
 
 .detail-summary {
@@ -542,7 +534,6 @@ select {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  border-bottom: 1px solid var(--line);
 }
 
 @media print {
@@ -870,7 +861,6 @@ textarea:focus {
   justify-content: space-between;
   gap: 1rem;
   color: #334754;
-  border-bottom: 1px solid #edf0f3;
   padding-bottom: 0.5rem;
 }
 
@@ -908,7 +898,6 @@ textarea:focus {
 .auth-trust {
   margin: 2rem 0 0;
   padding-top: 1.25rem;
-  border-top: 1px solid rgba(227, 241, 243, 0.35);
   font-size: 0.92rem;
 }
 
@@ -999,7 +988,6 @@ textarea:focus {
 .document-upload {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--line);
 }
 
 .input-error,
@@ -1096,7 +1084,6 @@ body,
 
 .header {
   background: rgba(7, 19, 29, 0.96);
-  border-bottom: 1px solid var(--line);
 }
 
 .brand-mark {
@@ -1244,15 +1231,10 @@ textarea:focus {
 
 .travel-card-heading {
   background: var(--surface-raised);
-  border-bottom: 1px solid var(--line);
 }
 
 .travel-search-card .btn-primary {
   background: var(--accent);
-}
-
-.travel-help-card {
-  border-top-color: var(--accent);
 }
 
 .travel-help-card .btn {
@@ -1261,7 +1243,6 @@ textarea:focus {
 }
 
 .help-line {
-  border-top-color: var(--line);
   color: var(--text);
 }
 
@@ -1272,7 +1253,6 @@ textarea:focus {
 }
 
 .summary-list li {
-  border-bottom-color: var(--line);
   color: var(--muted);
 }
 
@@ -1464,11 +1444,11 @@ textarea:focus {
 
 .modal:focus { outline: none; }
 .modal-header, .modal-footer { display: flex; align-items: center; padding: 1rem 1.25rem; }
-.modal-header { justify-content: space-between; border-bottom: 1px solid var(--line); }
+.modal-header { justify-content: space-between; }
 .modal-header h2 { margin: 0; font-size: 1.2rem; color: var(--text); }
 .modal-body { padding: 1.25rem; }
 .modal-body > :last-child { margin-bottom: 0; }
-.modal-footer { justify-content: flex-end; gap: .75rem; border-top: 1px solid var(--line); }
+.modal-footer { justify-content: flex-end; gap: .75rem; }
 .modal-close { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border: 1px solid var(--line); border-radius: .65rem; background: transparent; color: var(--text); cursor: pointer; font-size: 1.5rem; line-height: 1; }
 .modal-close:hover, .modal-close:focus-visible { background: var(--surface-raised); }
 .theme-light .modal-backdrop { background: rgb(16 33 43 / 40%); }
@@ -1512,7 +1492,7 @@ textarea:focus {
 /* Light theme must override the dark visual system declared above. */
 .theme-light { color-scheme: light; }
 .theme-light.app-shell { background: #f4f7f8; }
-.theme-light .header { background: rgb(255 255 255 / 96%); border-bottom-color: #cbdde1; }
+.theme-light .header { background: rgb(255 255 255 / 96%); }
 .theme-light .brand { color: #0c776f; }
 .theme-light .nav-link { color: #31505d; }
 .theme-light .nav-link.active, .theme-light .nav-link:hover, .theme-light .nav-link:focus-visible { background: #dff1f0; color: #10212b; }
@@ -1740,7 +1720,6 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outlin
   gap: 0.8rem;
   align-items: center;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--line);
 }
 
 .editorial-points strong {
@@ -1756,9 +1735,9 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outlin
   align-items: end;
   margin: 2rem 0 3rem;
   padding: 2rem 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
 }
+.modal-header { justify-content: space-between; }
+.modal-footer { justify-content: flex-end; gap: .75rem; }
 
 .page-intro-band p {
   margin: 0;
@@ -1834,6 +1813,9 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outlin
   text-decoration: underline;
 }
 
+/* Decorative separators are intentionally omitted across the application. */
+.header,
+.site-footer,
 /* Final contrast contract for every shared surface. */
 .theme-light {
   --page-bg: #f4f7f8;
