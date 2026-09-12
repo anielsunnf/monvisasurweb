@@ -24,6 +24,7 @@ Puis ouvrir l'URL affichée par Vite, généralement `http://localhost:5173/`.
 npm run dev     # serveur de développement
 npm run build   # compilation de production
 npm run lint    # contrôle Oxlint
+npm run test    # tests Vitest + Testing Library
 npm run preview # aperçu de la compilation
 ```
 
@@ -37,12 +38,20 @@ npm run preview # aperçu de la compilation
 - back-office avec consultation et modification des statuts ;
 - routes protégées selon l'authentification et le profil.
 
+## Ajouts récents
+
+- **Messagerie sur les dossiers** : un client échange avec le conseiller chargé de son dossier, le conseiller répond dans son back-office, l'administrateur consulte toutes les conversations. Les droits sont contrôlés dans la façade de données, pas dans les écrans.
+- **Interface en 6 langues** : français, anglais, espagnol, hindi, russe et chinois, via i18next. Le choix est mémorisé dans le navigateur et modifiable depuis le sélecteur de l'en-tête (`LanguageSwitcher`). Les libellés manquants d'une langue héritent automatiquement du français.
+- **Contrastes des deux thèmes** : le mode clair et le mode sombre garantissent la lisibilité des pastilles de statut, chips, messages d'erreur et accents sur toutes les pages, y compris sur téléphone.
+
 ## Architecture
 
-- `src/pages` : écrans publics, authentification, réservation et espace client ;
-- `src/components` : composants partagés ;
+- `src/pages` : écrans publics, authentification, réservation, espace client et back-office ;
+- `src/components` : composants partagés (en-tête, pied de page, modale, filtre, messages, routes protégées) ;
 - `src/data` : jeu de données statique des services et trajets ;
-- `src/api.js` : façade unique des appels de données locaux ;
+- `src/locales` : libellés des 6 langues ;
+- `src/test` : tests d'interface (Vitest + Testing Library) ;
+- `src/api.js` : façade unique des appels de données locaux.
 
 Les écrans appellent uniquement `src/api.js`. Lors du raccordement Spring Boot, ce fichier sera remplacé par les appels HTTP sans modifier les pages.
 
@@ -50,10 +59,14 @@ Les composants utilisent des états de chargement, succès, erreur et liste vide
 
 ## Limites connues
 
-Le projet utilise actuellement une API locale persistée dans le navigateur. Elle est destinée à la démonstration; les contrôles d'accès définitifs, les mots de passe chiffrés et le stockage de fichiers seront assurés par l'API Spring Boot.
+Le projet utilise actuellement une API locale persistée dans le navigateur. Elle est destinée à la démonstration ; les contrôles d'accès définitifs, les mots de passe chiffrés et le stockage de fichiers seront assurés par l'API Spring Boot.
 
 Comptes de démonstration préchargés :
 
 - client : `client@monvisasur.test` / `Client123!`
 - conseiller : `conseiller@monvisasur.test` / `Conseiller123!`
 - administrateur : `admin@monvisasur.test` / `Admin123!`
+
+## Dépôt
+
+Le code source est hébergé sur GitHub : https://github.com/anielsunnf/monvisasurweb (déploiement Vercel fourni via `vercel.json`).
