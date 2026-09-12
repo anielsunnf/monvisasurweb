@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-const languages = [{ code: 'fr', label: 'Français', flag: '🇫🇷' }, { code: 'en', label: 'English', flag: '🇬🇧' }, { code: 'ru', label: 'Русский', flag: '🇷🇺' }]
+const languages = [{ code: 'fr', label: 'Français', flag: '🇫🇷' }, { code: 'en', label: 'English', flag: '🇬🇧' }, { code: 'ru', label: 'Русский', flag: '🇷🇺' }, { code: 'es', label: 'Español', flag: '🇪🇸' }, { code: 'hi', label: 'हिन्दी', flag: '🇮🇳' }, { code: 'zh', label: '中文', flag: '🇨🇳' }]
 
 export function LanguageSwitcher() {
   const { i18n, t } = useTranslation()

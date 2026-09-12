@@ -65,7 +65,7 @@ export function TripsManagementPage() {
       <div className="form-grid compact-form">
         <div className="field"><label htmlFor="journey-from">Ville de départ</label><input id="journey-from" value={journeyForm.from || ''} onChange={event => updateField('from', event.target.value)} autoFocus /></div>
         <div className="field"><label htmlFor="journey-to">Ville d’arrivée</label><input id="journey-to" value={journeyForm.to || ''} onChange={event => updateField('to', event.target.value)} /></div>
-        <div className="field"><label htmlFor="journey-date">Date</label><input id="journey-date" type="date" value={journeyForm.date || ''} onChange={event => updateField('date', event.target.value)} /></div>
+        <div className="field"><label htmlFor="journey-date">{t('ui.date')}</label><input id="journey-date" type="date" value={journeyForm.date || ''} onChange={event => updateField('date', event.target.value)} /></div>
         <div className="field"><label htmlFor="journey-departure">Heure de départ</label><input id="journey-departure" type="time" value={journeyForm.departure || ''} onChange={event => updateField('departure', event.target.value)} /></div>
         <div className="field"><label htmlFor="journey-arrival">Heure d’arrivée</label><input id="journey-arrival" type="time" value={journeyForm.arrival || ''} onChange={event => updateField('arrival', event.target.value)} /></div>
         <div className="field"><label htmlFor="seats">{t('ui.available_seats')}</label><input id="seats" type="number" min="0" step="1" value={journeyForm.seats || ''} onChange={event => updateField('seats', event.target.value)} /></div>

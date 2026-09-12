@@ -62,10 +62,10 @@ export function CataloguePage() {
 
       <div className="page-intro-band">
         <div>
-          <span className="eyebrow">Un accompagnement sur mesure</span>
-          <h2>Du premier document au dernier suivi.</h2>
+          <span className="eyebrow">{t('catalogue.band_eyebrow')}</span>
+          <h2>{t('catalogue.band_title')}</h2>
         </div>
-        <p>Parcourez nos prestations, comparez les délais et ouvrez votre dossier quand vous êtes prêt. Les informations importantes restent visibles à chaque étape.</p>
+        <p>{t('catalogue.band_text')}</p>
       </div>
 
       {services.length === 0 ? (
@@ -94,7 +94,7 @@ export function CataloguePage() {
               </ul>
               <div className="card-actions">
                 <NavLink to={`/catalogue/${service.id}`} className="btn btn-primary">
-                  En savoir plus
+                  {t('catalogue.learn_more')}
                 </NavLink>
               </div>
               </div>

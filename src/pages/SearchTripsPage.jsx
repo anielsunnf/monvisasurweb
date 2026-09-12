@@ -5,7 +5,8 @@ import { FilterBar } from '../components/FilterBar'
 import { useI18n } from '../components/useI18n'
 
 export function SearchTripsPage() {
-  const { t } = useI18n()
+  const { t, language } = useI18n()
+  const currentLanguage = language || 'fr'
   const [searchParams] = useSearchParams()
   const reservationWindow = getReservationWindow()
   const [form, setForm] = useState(() => ({ from: searchParams.get('from') || '', to: searchParams.get('to') || '', date: '', passengers: '' }))
@@ -116,7 +117,7 @@ export function SearchTripsPage() {
             <label htmlFor="from">{t('search.from')} *</label>
             <input
               id="from"
-              placeholder="Ex : Yaoundé"
+              placeholder={t('ui.from_placeholder')}
               value={form.from}
               list="available-cities"
               onFocus={() => setActiveCityField('from')}
@@ -125,7 +126,7 @@ export function SearchTripsPage() {
               aria-invalid={Boolean(errors.from)}
             />
             {errors.from && <span className="field-error">{errors.from}</span>}
-            <div className="city-options" aria-label="Villes de départ disponibles">
+            <div className="city-options" aria-label={t('ui.available_departure_cities_a11y')}>
               {availableDepartureCities.map(city => <button key={`from-${city}`} type="button" className={`city-option ${form.from === city ? 'selected' : ''}`} onClick={() => selectCity(city, 'from')}>{city}</button>)}
             </div>
           </div>
@@ -134,7 +135,7 @@ export function SearchTripsPage() {
             <label htmlFor="to">{t('search.to')} *</label>
             <input
               id="to"
-              placeholder="Ex : Douala"
+              placeholder={t('ui.to_placeholder')}
               value={form.to}
               list="available-cities"
               onFocus={() => setActiveCityField('to')}
@@ -143,7 +144,7 @@ export function SearchTripsPage() {
               aria-invalid={Boolean(errors.to)}
             />
             {errors.to && <span className="field-error">{errors.to}</span>}
-            <div className="city-options" aria-label="Villes d’arrivée disponibles">
+            <div className="city-options" aria-label={t('ui.available_arrival_cities_a11y')}>
               {availableArrivalCities.map(city => <button key={`to-${city}`} type="button" className={`city-option ${form.to === city ? 'selected' : ''}`} onClick={() => selectCity(city, 'to')}>{city}</button>)}
             </div>
           </div>
@@ -162,10 +163,10 @@ export function SearchTripsPage() {
               aria-invalid={Boolean(errors.date)}
             />
             {errors.date && <span className="field-error">{errors.date}</span>}
-            {availableDates.length > 0 && <div className="available-dates" aria-label="Dates disponibles pour ce créneau">
-              <span className="available-dates-label">Dates disponibles pour ce trajet</span>
+            {availableDates.length > 0 && <div className="available-dates" aria-label={t('ui.available_dates_a11y')}>
+              <span className="available-dates-label">{t('ui.available_dates_trip')}</span>
               <div className="city-options date-options">
-                {availableDates.map(date => <a key={date} href="#date" className={`city-option ${form.date === date ? 'selected' : ''}`} onClick={() => setForm(current => ({ ...current, date }))}>{new Date(`${date}T00:00:00`).toLocaleDateString('fr-FR')}</a>)}
+                {availableDates.map(date => <a key={date} href="#date" className={`city-option ${form.date === date ? 'selected' : ''}`} onClick={() => setForm(current => ({ ...current, date }))}>{new Date(`${date}T00:00:00`).toLocaleDateString(currentLanguage.replace('_', '-'))}</a>)}
               </div>
             </div>}
           </div>
@@ -195,7 +196,7 @@ export function SearchTripsPage() {
               onClick={handleSearch}
               disabled={loading}
             >
-              {loading ? `${t('search')}...` : t('search')}
+              {loading ? t('search.searching') : t('search')}
             </button>
           </div>
         </div>
@@ -241,12 +242,12 @@ export function SearchTripsPage() {
                       <span>⏱ {journey.duration}</span>
                       <span className="chip">{journey.type}</span>
                     </div>
-                    <p className="small-muted">🚌 {journey.transport} · {journey.seats} places restantes</p>
+                    <p className="small-muted">🚌 {journey.transport} · {journey.seats} {t('ui.seats')}</p>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div className="price">{journey.price.toLocaleString()} {journey.currency}</div>
+                    <div className="price">{journey.price.toLocaleString(currentLanguage)} {journey.currency}</div>
                     <NavLink to={`/reservation/${journey.id}?passengers=${form.passengers}&date=${form.date}`} className="btn btn-primary" style={{ marginTop: '0.5rem' }}>
-                      Choisir
+                      {t('ui.choose')}
                     </NavLink>
                   </div>
                 </article>
