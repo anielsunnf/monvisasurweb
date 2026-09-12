@@ -2380,3 +2380,101 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outlin
 .chat-block h4 {
   margin: 0 0 0.5rem;
 }
+
+/* Contrast contract extension: the accent variable must exist in light mode.
+   #19d3ae is tuned for dark surfaces (~1.9:1 on white); #075d58 reaches ~6.4:1. */
+.theme-light {
+  --accent: #075d58;
+  --accent-strong: #05443f;
+}
+
+/* Accent-driven backgrounds keep readable text in light mode. */
+.theme-light .tab.active,
+.theme-light .brand-mark,
+.theme-light .toast > span,
+.theme-light .password-toggle:hover,
+.theme-light .password-toggle:focus-visible {
+  background: #087f75;
+  border-color: #087f75;
+  color: #ffffff;
+  outline-color: #087f75;
+}
+
+/* The destination band keeps a dark surface in dark mode (#edf5f3 base would
+   turn light headings invisible). */
+.theme-dark .destination-section {
+  background: #0a1c28;
+}
+
+/* Alignment contract: table cells and long headers keep one baseline. */
+th {
+  text-align: left;
+  vertical-align: middle;
+}
+
+td {
+  vertical-align: middle;
+}
+
+.section-header {
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+   Correctifs de contraste thematic — manquants detects par audit
+   (les dernieres regles gagnent a specificite egale)
+   ============================================================ */
+
+/* Mode sombre : elements restes aux couleurs du theme clair */
+.theme-dark .chip {
+  background: rgba(25, 211, 174, 0.12);
+  color: #7ee6cc;
+  border: 1px solid rgba(25, 211, 174, 0.35);
+}
+
+.theme-dark .error-state {
+  background: rgba(220, 80, 80, 0.12);
+  border-color: #d56a6a;
+  color: #f3b8b8;
+}
+
+.theme-dark .city-option {
+  background: var(--surface-raised);
+  border-color: var(--line);
+  color: var(--text);
+}
+
+.theme-dark .city-option:hover,
+.theme-dark .city-option:focus-visible,
+.theme-dark .city-option.selected {
+  border-color: var(--accent);
+  background: rgba(25, 211, 174, 0.14);
+  color: var(--accent);
+}
+
+.theme-dark .meta-line {
+  color: var(--muted);
+}
+
+.theme-dark .success-message {
+  color: var(--accent);
+}
+
+/* Badges de statut : translucides en sombre, lisibles dans les deux modes */
+.theme-dark .status-paid { background: rgba(46, 204, 113, 0.15); color: #7ee6b8; }
+.theme-dark .status-review { background: rgba(248, 211, 109, 0.15); color: #f8d36d; }
+.theme-dark .status-cancelled,
+.theme-dark .status-rejected { background: rgba(220, 80, 80, 0.15); color: #f3a8a8; }
+
+/* Mode clair : textes accent teal trop peu contrastes sur fond blanc */
+.theme-light .eyebrow {
+  color: #0d5e6d;
+}
+
+.theme-light .success-message {
+  color: #0d7d63;
+}
+
+.theme-light .brand {
+  color: #0d5e6d;
+}
