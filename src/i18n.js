@@ -28,14 +28,59 @@ const feedbackTranslations = {
   ru: { logging_in: 'Выполняется вход...', admin_success: 'Вход администратора выполнен. Перенаправление в панель управления...', advisor_success: 'Вход консультанта выполнен. Перенаправление в ваш кабинет...', client_success: 'Вход выполнен. Перенаправление в ваш кабинет...', login_error: 'Не удалось войти. Проверьте ваши данные.' },
 }
 
+const fallbackAdditions = {
+  fr: {
+    common: { error: 'Une erreur est survenue.', load_error: 'Impossible de charger les données.', select: 'Sélectionner', no_services: 'Aucune prestation disponible pour le moment.', view_details: 'Voir les détails', load_services_error: 'Impossible de charger les prestations.', load_catalogue_error: 'Impossible de charger le catalogue.' },
+    catalogue: { title: 'Catalogue', lead: 'Parcourez les prestations et ouvrez un dossier.' },
+    booking: { slot: 'Créneau' },
+  },
+  en: {
+    common: { error: 'Something went wrong.', load_error: 'Unable to load the data.', select: 'Select', no_services: 'No services are available at the moment.', view_details: 'View details', load_services_error: 'Unable to load services.', load_catalogue_error: 'Unable to load the catalogue.' },
+    catalogue: { title: 'Catalogue', lead: 'Browse the services and open a file.' },
+    booking: { slot: 'Time slot' },
+  },
+  ru: {
+    common: { error: 'Произошла ошибка.', load_error: 'Не удалось загрузить данные.', select: 'Выбрать', no_services: 'Сейчас нет доступных услуг.', view_details: 'Подробнее', load_services_error: 'Не удалось загрузить услуги.', load_catalogue_error: 'Не удалось загрузить каталог.' },
+    catalogue: { title: 'Каталог', lead: 'Просмотрите услуги и откройте дело.' },
+    booking: { slot: 'Время' },
+  },
+  es: {
+    common: { error: 'Se ha producido un error.', load_error: 'No se pudieron cargar los datos.', select: 'Seleccionar', no_services: 'No hay servicios disponibles por el momento.', view_details: 'Ver detalles', load_services_error: 'No se pudieron cargar los servicios.', load_catalogue_error: 'No se pudo cargar el catálogo.' },
+    catalogue: { title: 'Catálogo', lead: 'Explora los servicios y abre un expediente.' },
+    booking: { slot: 'Horario' },
+  },
+  hi: {
+    common: { error: 'कोई त्रुटि हुई।', load_error: 'डेटा लोड नहीं हो सका।', select: 'चुनें', no_services: 'फिलहाल कोई सेवा उपलब्ध नहीं है।', view_details: 'विवरण देखें', load_services_error: 'सेवाएं लोड नहीं हो सकीं।', load_catalogue_error: 'कैटलॉग लोड नहीं हो सका।' },
+    catalogue: { title: 'कैटलॉग', lead: 'सेवाएं देखें और केस खोलें।' },
+    booking: { slot: 'समय' },
+  },
+  zh: {
+    common: { error: '发生错误。', load_error: '无法加载数据。', select: '选择', no_services: '目前没有可用服务。', view_details: '查看详情', load_services_error: '无法加载服务。', load_catalogue_error: '无法加载目录。' },
+    catalogue: { title: '目录', lead: '浏览服务并创建档案。' },
+    booking: { slot: '时间段' },
+  },
+}
+
+function mergeDeep(target, source) {
+  const output = { ...(target || {}) }
+  for (const [key, value] of Object.entries(source || {})) {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      output[key] = mergeDeep(output[key], value)
+    } else {
+      output[key] = value
+    }
+  }
+  return output
+}
+
 i18n.use(LanguageDetector).use(initReactI18next).init({
   resources: {
-    fr: { translation: { ...fr, ui: uiTranslations.fr, dossier: dossierTranslations.fr, ...interfaceTranslations.fr, feedback: feedbackTranslations.fr }, legacy: translations.fr },
-    en: { translation: { ...en, ui: uiTranslations.en, dossier: dossierTranslations.en, ...interfaceTranslations.en, feedback: feedbackTranslations.en }, legacy: translations.en },
-    ru: { translation: { ...ru, ui: uiTranslations.ru, dossier: dossierTranslations.ru, ...interfaceTranslations.ru, feedback: feedbackTranslations.ru }, legacy: translations.ru },
-    es: { translation: { ...es, ui: uiTranslations.es }, legacy: translations.es },
-    hi: { translation: { ...hi, ui: uiTranslations.hi }, legacy: translations.hi },
-    zh: { translation: { ...zh, ui: uiTranslations.zh }, legacy: translations.zh },
+    fr: { translation: mergeDeep({ ...fr, ui: uiTranslations.fr, dossier: dossierTranslations.fr, ...interfaceTranslations.fr, feedback: feedbackTranslations.fr }, fallbackAdditions.fr), legacy: translations.fr },
+    en: { translation: mergeDeep({ ...en, ui: uiTranslations.en, dossier: dossierTranslations.en, ...interfaceTranslations.en, feedback: feedbackTranslations.en }, fallbackAdditions.en), legacy: translations.en },
+    ru: { translation: mergeDeep({ ...ru, ui: uiTranslations.ru, dossier: dossierTranslations.ru, ...interfaceTranslations.ru, feedback: feedbackTranslations.ru }, fallbackAdditions.ru), legacy: translations.ru },
+    es: { translation: mergeDeep({ ...es, ui: uiTranslations.es }, fallbackAdditions.es), legacy: translations.es },
+    hi: { translation: mergeDeep({ ...hi, ui: uiTranslations.hi }, fallbackAdditions.hi), legacy: translations.hi },
+    zh: { translation: mergeDeep({ ...zh, ui: uiTranslations.zh }, fallbackAdditions.zh), legacy: translations.zh },
   },
   fallbackLng: 'fr',
   supportedLngs: ['fr', 'en', 'ru', 'es', 'hi', 'zh'],

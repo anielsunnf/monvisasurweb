@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { createDossier, getServices } from '../../api'
 import { localizeService } from '../../data/services'
@@ -7,13 +7,22 @@ import { localizeService } from '../../data/services'
 export function NewDossierPage({ user }) {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [form, setForm] = useState({ serviceId: '', nationality: '', destination: '', motif: '', document: null })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [services, setServices] = useState([])
 
-  useEffect(() => { getServices().then(setServices) }, [])
+  useEffect(() => {
+    getServices().then(nextServices => {
+      setServices(nextServices)
+      const preselected = searchParams.get('service')
+      if (preselected && nextServices.some(item => item.id === preselected)) {
+        setForm(current => (current.serviceId ? current : { ...current, serviceId: preselected }))
+      }
+    })
+  }, [searchParams])
 
   function validate() {
     const nextErrors = {}
@@ -33,7 +42,8 @@ export function NewDossierPage({ user }) {
     try {
       const service = services.find(item => item.id === form.serviceId)
       const localizedService = service ? localizeService(service, i18n.resolvedLanguage || i18n.language) : null
-      await createDossier({ userId: user.id, serviceId: form.serviceId, service: localizedService?.name ?? form.serviceId, nationality: form.nationality, destination: form.destination, motif: form.motif, documents: [form.document?.name ?? 'document.pdf'] })
+      const documentObj = form.document ? { name: form.document.name, type: form.document.type, data: await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(form.document); }) } : { name: 'document.pdf', type: 'application/pdf', data: '' }
+      await createDossier({ userId: user.id, serviceId: form.serviceId, service: localizedService?.name ?? form.serviceId, nationality: form.nationality, destination: form.destination, motif: form.motif, documents: [documentObj] })
       setSuccess(true)
       setTimeout(() => navigate('/client'), 2000)
     } catch {

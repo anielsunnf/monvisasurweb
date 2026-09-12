@@ -18,6 +18,9 @@ export function SearchTripsPage() {
   const [filterType, setFilterType] = useState('')
   const [carrier, setCarrier] = useState('')
   const [activeCityField, setActiveCityField] = useState('from')
+  const [sessionUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('monvisasur.session') || 'null') } catch { return null }
+  })
   const availableDepartureCities = getAvailableJourneyCities({ field: 'from', to: form.to })
   const availableArrivalCities = getAvailableJourneyCities({ field: 'to', from: form.from })
   const availableDates = getAvailableJourneyDates({ from: form.from, to: form.to })
@@ -70,12 +73,22 @@ export function SearchTripsPage() {
     return cities.some(city => normalizeCity(city) === normalizeCity(value))
   }
 
+  function durationToMinutes(value) {
+    if (!value) return Number.MAX_SAFE_INTEGER
+    const hoursMatch = value.match(/(\d+)\s*h/i)
+    const minutesMatch = value.match(/(\d+)\s*(?:min|m(?!s))/i)
+    const hours = hoursMatch ? Number(hoursMatch[1]) : 0
+    const minutes = minutesMatch ? Number(minutesMatch[1]) : 0
+    if (!hoursMatch && !minutesMatch) return Number.MAX_SAFE_INTEGER
+    return hours * 60 + minutes
+  }
+
   const filtered = results
     .filter(j => !filterType || j.type === filterType)
     .filter(j => !carrier || j.transport === carrier)
     .sort((a, b) => {
       if (sortBy === 'price') return a.price - b.price
-      if (sortBy === 'duration') return a.duration.localeCompare(b.duration)
+      if (sortBy === 'duration') return durationToMinutes(a.duration) - durationToMinutes(b.duration)
       if (sortBy === 'departure') return a.departure.localeCompare(b.departure)
       return 0
     })
@@ -195,7 +208,7 @@ export function SearchTripsPage() {
           <h2>{t('booking.assistance')}</h2>
           <p>{t('search.help_description')}</p>
           <div className="help-line"><span aria-hidden="true">✉</span><span>{t('search.help_response')}</span></div>
-          <NavLink to="/login" className="btn btn-secondary">{t('search.contact')}</NavLink>
+          <NavLink to={sessionUser ? '/client' : '/login'} className="btn btn-secondary">{t('search.contact')}</NavLink>
         </aside>
       </div>
 

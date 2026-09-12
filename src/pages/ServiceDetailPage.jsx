@@ -8,6 +8,8 @@ import { useI18n } from '../components/useI18n'
 export function ServiceDetailPage() {
   const { language, t } = useI18n()
   const { id } = useParams()
+  const storedSession = (() => { try { return JSON.parse(localStorage.getItem('monvisasur.session') || 'null') } catch { return null } })()
+  const dossierTarget = storedSession ? '/client/dossiers/nouveau?service=' + id : '/login'
   const [service, setService] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -30,7 +32,7 @@ export function ServiceDetailPage() {
         <div className="meta-line"><span>{t('service_detail.delay')}: {localizedService.delay}</span><strong>{localizedService.price.toLocaleString()} FCFA</strong></div>
         <h2>{t('service_detail.documents')}</h2>
         <ul>{localizedService.documents.map(document => <li key={document}>{document}</li>)}</ul>
-        <NavLink to="/login" className="btn btn-primary">{t('service_detail.open_file')}</NavLink>
+        <NavLink to={dossierTarget} className="btn btn-primary">{t('service_detail.open_file')}</NavLink>
       </section>
     </main>
   )

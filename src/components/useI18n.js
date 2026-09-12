@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 
-const legacyKeys = {
+const LEGACY_KEYS = {
   home: 'nav.home',
   catalogue: 'nav.catalogue',
   travel: 'nav.book',
@@ -49,7 +49,7 @@ const legacyKeys = {
 
 export function useI18n() {
   const { t: translate, i18n } = useTranslation()
-  const t = useCallback((key, options) => translate(legacyKeys[key] || key, options), [translate])
+  const t = useCallback((key, options) => translate(LEGACY_KEYS[key] || key, options), [translate])
   return {
     t,
     language: i18n.resolvedLanguage || i18n.language,

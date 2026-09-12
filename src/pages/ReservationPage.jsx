@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { NavLink, useParams, useSearchParams } from 'react-router-dom'
 import { createOrder, getJourneyById, getReservationWindow } from '../api'
 import { useI18n } from '../components/useI18n'
@@ -7,11 +7,12 @@ export function ReservationPage({ user }) {
   const { t } = useI18n()
   const { id } = useParams()
   const [searchParams] = useSearchParams()
-  const passengerCount = Number(searchParams.get('passengers'))
+  const parsedPassengers = Number(searchParams.get('passengers'))
+  const passengerCount = Number.isInteger(parsedPassengers) && parsedPassengers > 0 ? parsedPassengers : 1
   const selectedDate = searchParams.get('date') || ''
   const reservationWindow = getReservationWindow()
   const [journey, setJourney] = useState(null)
-  const [passengers, setPassengers] = useState(() => Array.from({ length: passengerCount > 0 ? passengerCount : 0 }, () => ({ name: '', document: null })))
+  const [passengers, setPassengers] = useState(() => Array.from({ length: passengerCount }, () => ({ name: '', document: null })))
   const [payment, setPayment] = useState({ method: '', reference: '' })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(true)
@@ -25,12 +26,19 @@ export function ReservationPage({ user }) {
     getJourneyById(id).then(setJourney).finally(() => setLoading(false))
   }, [id])
 
+  // Derive adjusted passengers array during render to follow URL count without setState-in-effect.
+  const adjustedPassengers = useMemo(() => {
+    if (passengers.length === passengerCount) return passengers
+    if (passengers.length > passengerCount) return passengers.slice(0, passengerCount)
+    return [...passengers, ...Array.from({ length: passengerCount - passengers.length }, () => ({ name: '', document: null }))]
+  }, [passengers, passengerCount])
+
   function validate() {
     const nextErrors = {}
     if (!journey) nextErrors.journey = 'Le trajet sélectionné est introuvable.'
     if (!selectedDate || selectedDate < reservationWindow.min || selectedDate > reservationWindow.max) nextErrors.date = `La réservation est possible du ${reservationWindow.min} au ${reservationWindow.max}.`
     if (!Number.isInteger(passengerCount) || passengerCount < 1) nextErrors.passengers = 'Le nombre de passagers est invalide.'
-    passengers.forEach((passenger, index) => {
+    adjustedPassengers.forEach((passenger, index) => {
       if (!passenger.name.trim()) nextErrors[`passenger-${index}`] = `Le nom du passager ${index + 1} est requis.`
       if (!passenger.document) nextErrors[`document-${index}`] = `Le document d'identité du passager ${index + 1} est requis.`
       else if (!['application/pdf', 'image/jpeg', 'image/png'].includes(passenger.document.type)) nextErrors[`document-${index}`] = 'Le document doit être au format PDF, JPG ou PNG.'
@@ -56,7 +64,7 @@ export function ReservationPage({ user }) {
         userId: user.id,
         journeyId: journey.id,
         route: `${journey.from} → ${journey.to}`,
-        passengers: passengers.map(passenger => ({ name: passenger.name.trim(), document: passenger.document.name })),
+        passengers: adjustedPassengers.map(passenger => ({ name: passenger.name.trim(), document: passenger.document.name })),
         total: totalPrice,
         currency: journey.currency,
         journey,
@@ -84,7 +92,7 @@ export function ReservationPage({ user }) {
           <h2>{t('search.passengers')}</h2>
           {submitError && <div className="alert alert-error" role="alert">{submitError}</div>}
           <p className="small-muted">{t('ui.passenger_instruction', { count: passengerCount })}</p>
-          {passengers.map((passenger, index) => <div className="passenger-form" key={index}><h3>{t('ui.passenger_label', { number: index + 1 })}</h3><div className="form-grid"><div className="field"><label htmlFor={`passenger-name-${index}`}>{t('ui.full_name')} *</label><input id={`passenger-name-${index}`} value={passenger.name} onChange={event => setPassengers(current => current.map((item, itemIndex) => itemIndex === index ? { ...item, name: event.target.value } : item))} aria-invalid={Boolean(errors[`passenger-${index}`])} />{errors[`passenger-${index}`] && <span className="field-error">{errors[`passenger-${index}`]}</span>}</div><div className="field"><label htmlFor={`passenger-document-${index}`}>{t('ui.identity_document')} *</label><input id={`passenger-document-${index}`} type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={event => setPassengers(current => current.map((item, itemIndex) => itemIndex === index ? { ...item, document: event.target.files?.[0] || null } : item))} />{errors[`document-${index}`] && <span className="field-error">{errors[`document-${index}`]}</span>}</div></div></div>)}
+          {adjustedPassengers.map((passenger, index) => <div className="passenger-form" key={index}><h3>{t('ui.passenger_label', { number: index + 1 })}</h3><div className="form-grid"><div className="field"><label htmlFor={`passenger-name-${index}`}>{t('ui.full_name')} *</label><input id={`passenger-name-${index}`} value={passenger.name} onChange={event => setPassengers(current => current.map((item, itemIndex) => itemIndex === index ? { ...item, name: event.target.value } : item))} aria-invalid={Boolean(errors[`passenger-${index}`])} />{errors[`passenger-${index}`] && <span className="field-error">{errors[`passenger-${index}`]}</span>}</div><div className="field"><label htmlFor={`passenger-document-${index}`}>{t('ui.identity_document')} *</label><input id={`passenger-document-${index}`} type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={event => setPassengers(current => current.map((item, itemIndex) => itemIndex === index ? { ...item, document: event.target.files?.[0] || null } : item))} />{errors[`document-${index}`] && <span className="field-error">{errors[`document-${index}`]}</span>}</div></div></div>)}
           <div className="field"><label htmlFor="payment-method">{t('ui.simulated_payment')} *</label><select id="payment-method" value={payment.method} onChange={event => setPayment(current => ({ ...current, method: event.target.value }))}><option value="">{t('ui.choose_method')}</option><option value="mobile-money">{t('ui.simulated_payment')} Mobile Money</option><option value="card">{t('ui.payment')} Card</option><option value="bank">{t('ui.payment')} Bank</option></select>{errors.paymentMethod && <span className="field-error">{errors.paymentMethod}</span>}</div>
           <div className="field"><label htmlFor="payment-reference">{t('ui.payment_reference')} *</label><input id="payment-reference" value={payment.reference} onChange={event => setPayment(current => ({ ...current, reference: event.target.value }))} placeholder={t('ui.payment_reference_placeholder')} />{errors.paymentReference && <span className="field-error">{errors.paymentReference}</span>}</div>
           <button type="button" className="btn btn-primary" onClick={handleConfirm} disabled={submitting}>{submitting ? t('ui.confirming') : t('ui.confirm_booking')}</button>

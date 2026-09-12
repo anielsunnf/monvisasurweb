@@ -5,8 +5,28 @@ const STORAGE_KEYS = {
   users: 'monvisasur.users', dossiers: 'monvisasur.dossiers', orders: 'monvisasur.orders',
   appointments: 'monvisasur.appointments', notifications: 'monvisasur.notifications',
   catalogue: 'monvisasur.catalogue', journeys: 'monvisasur.journeys', session: 'monvisasur.session',
+  messages: 'monvisasur.messages',
 }
 
+// Convertit un fichier en base64 pour le stockage local
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve({ name: file.name, type: file.type, data: reader.result })
+    reader.onerror = () => reject(new Error('Erreur lors de la lecture du fichier.'))
+    reader.readAsDataURL(file)
+  })
+}
+
+// Convertit un document (nom ou fichier) en objet document normalisé
+async function normalizeDocument(document) {
+  if (typeof document === 'string') return document
+  if (document && typeof document === 'object' && document.data) return document
+  if (document instanceof File || document instanceof Blob) {
+    return fileToBase64(document)
+  }
+  return document?.name || 'document.pdf'
+}
 function getStorage() {
   const candidates = []
 
@@ -62,6 +82,58 @@ let appointmentStore = loadStore(STORAGE_KEYS.appointments, [])
 let notificationStore = loadStore(STORAGE_KEYS.notifications, [])
 let catalogueStore = loadStore(STORAGE_KEYS.catalogue, services.map(service => ({ ...service, active: service.active !== false })))
 let journeyStore = loadStore(STORAGE_KEYS.journeys, journeys)
+let messageStore = loadStore(STORAGE_KEYS.messages, [])
+
+// Jeu de démonstration : un dossier client déjà assigné à un conseiller, avec une conversation
+const seededDossiers = [{
+  id: 'DOS-DEMO-001',
+  userId: 'USR-CLIENT',
+  advisorId: 'USR-ADVISOR',
+  serviceId: 'visa',
+  service: 'Visa Schengen',
+  nationality: 'Camerounaise',
+  destination: 'France',
+  motif: 'Séjour touristique de 15 jours.',
+  date: new Date().toLocaleDateString('fr-FR'),
+  status: 'en_cours',
+  documents: ['passeport.pdf'],
+  history: [{ label: 'Demande créée', date: new Date().toLocaleDateString('fr-FR'), description: 'Dossier ouvert par le client.' }],
+  additionalRequest: '',
+  clientResponse: '',
+}]
+
+const seededMessages = [
+  {
+    id: 'MSG-DEMO-1',
+    dossierId: 'DOS-DEMO-001',
+    senderId: 'USR-ADVISOR',
+    senderName: 'Conseiller démo',
+    senderRole: 'advisor',
+    content: 'Bonjour, votre dossier a bien été reçu. Pouvez-vous confirmer la date prévue de votre départ ?',
+    date: '2026-09-10T10:15:00.000Z',
+  },
+  {
+    id: 'MSG-DEMO-2',
+    dossierId: 'DOS-DEMO-001',
+    senderId: 'USR-CLIENT',
+    senderName: 'Client démo',
+    senderRole: 'client',
+    content: "Bonjour, je prévois de partir début décembre si possible.",
+    date: '2026-09-10T14:02:00.000Z',
+  },
+  {
+    id: 'MSG-DEMO-3',
+    dossierId: 'DOS-DEMO-001',
+    senderId: 'USR-ADVISOR',
+    senderName: 'Conseiller démo',
+    senderRole: 'advisor',
+    content: "C'est noté. Dès réception de votre passeport, je lance la demande. Pensez à le téléverser.",
+    date: '2026-09-10T15:40:00.000Z',
+  },
+]
+
+if (dossierStore.length === 0) dossierStore = seededDossiers
+if (messageStore.length === 0) messageStore = seededMessages
 
 userStore = [...demoUsers, ...userStore.filter(user => !demoUsers.some(demo => demo.email === user.email))]
 saveStore(USER_STORAGE_KEY, userStore)
@@ -71,6 +143,9 @@ function persistAppointments() { saveStore(STORAGE_KEYS.appointments, appointmen
 function persistNotifications() { saveStore(STORAGE_KEYS.notifications, notificationStore) }
 function persistCatalogue() { saveStore(STORAGE_KEYS.catalogue, catalogueStore) }
 function persistJourneys() { saveStore(STORAGE_KEYS.journeys, journeyStore) }
+function persistMessages() { saveStore(STORAGE_KEYS.messages, messageStore) }
+persistDossiers()
+persistMessages()
 
 export function getReservationWindow() {
   const today = new Date()
@@ -146,7 +221,10 @@ export function getAllDossiers() {
   return Promise.resolve(dossierStore)
 }
 
-export function createDossier(dossier) {
+export async function createDossier(dossier) {
+  if (dossier.documents && Array.isArray(dossier.documents)) {
+    dossier.documents = await Promise.all(dossier.documents.map(normalizeDocument))
+  }
   const created = {
     ...dossier,
     id: `DOS-${Date.now()}`,
@@ -196,16 +274,18 @@ export function respondToDossierRequest(id, response) {
   return Promise.resolve()
 }
 
-export function addDossierDocument(id, userId, document) {
+export async function addDossierDocument(id, userId, document) {
+  const normalized = await normalizeDocument(document)
+  const normalizedName = typeof normalized === 'string' ? normalized : normalized.name
   const target = dossierStore.find(dossier => dossier.id === id && dossier.userId === userId)
   if (!target) return Promise.reject(new Error('Dossier introuvable.'))
   dossierStore = dossierStore.map(dossier => dossier.id === id ? {
     ...dossier,
-    documents: [...(dossier.documents || []), document.name],
-    history: [...(dossier.history || []), { label: 'Pièce complémentaire transmise', date: new Date().toLocaleDateString('fr-FR'), description: document.name }],
+    documents: [...(dossier.documents || []), normalized],
+    history: [...(dossier.history || []), { label: 'Pièce complémentaire transmise', date: new Date().toLocaleDateString('fr-FR'), description: typeof normalized === 'string' ? normalized : normalized.name }],
   } : dossier)
   persistDossiers()
-  addNotification({ userId, title: 'Pièce complémentaire transmise', message: document.name })
+  addNotification({ userId, title: 'Pièce complémentaire transmise', message: normalizedName })
   return Promise.resolve()
 }
 
@@ -268,8 +348,11 @@ export function getOrders(userId) {
 export function cancelOrder(id, userId) {
   const order = orderStore.find(candidate => candidate.id === id && candidate.userId === userId)
   if (!order) return Promise.reject(new Error('Commande introuvable.'))
+  if (order.status === 'annulée') return Promise.reject(new Error('Cette commande est déjà annulée.'))
   const departureDate = order.selectedDate || order.journey.date
-  const daysUntilDeparture = Math.ceil((new Date(`${departureDate}T${order.journey.departure}`) - new Date()) / 86400000)
+  const departure = new Date(`${departureDate}T${order.journey.departure || '00:00'}`)
+  if (Number.isNaN(departure.getTime())) return Promise.reject(new Error('Date de départ invalide.'))
+  const daysUntilDeparture = Math.ceil((departure.getTime() - Date.now()) / 86400000)
   if (daysUntilDeparture < 2) return Promise.reject(new Error('Annulation possible jusqu’à 48 heures avant le départ.'))
   orderStore = orderStore.map(candidate => candidate.id === id ? { ...candidate, status: 'annulée', cancelledAt: new Date().toLocaleDateString('fr-FR') } : candidate)
   journeyStore = journeyStore.map(candidate => candidate.id === order.journeyId ? { ...candidate, seats: candidate.seats + order.passengers.length } : candidate)
@@ -334,21 +417,22 @@ export function getAllJourneys() {
   return Promise.resolve(journeyStore)
 }
 
-export function replaceDossierDocument(id, userId, index, document) {
+export async function replaceDossierDocument(id, userId, index, document) {
+  const normalized = await normalizeDocument(document)
   const target = dossierStore.find(dossier => dossier.id === id && dossier.userId === userId)
   if (!target) return Promise.reject(new Error('Dossier introuvable.'))
   dossierStore = dossierStore.map(dossier => {
     if (dossier.id !== id) return dossier
     const documents = [...(dossier.documents || [])]
-    documents[index] = document.name
+    documents[index] = normalized
     return {
       ...dossier,
       documents,
-      history: [...(dossier.history || []), { label: 'Pièce remplacée', date: new Date().toLocaleDateString('fr-FR'), description: document.name }],
+      history: [...(dossier.history || []), { label: 'Pièce remplacée', date: new Date().toLocaleDateString('fr-FR'), description: typeof normalized === 'string' ? normalized : normalized.name }],
     }
   })
   persistDossiers()
-  addNotification({ userId, title: 'Pièce remplacée', message: document.name })
+  addNotification({ userId, title: 'Pièce remplacée', message: typeof normalized === 'string' ? normalized : normalized.name })
   return Promise.resolve()
 }
 
@@ -370,4 +454,61 @@ export function assignDossierAdvisor(id, advisorId) {
 
 export function getAdvisorDossiers(advisorId) {
   return Promise.resolve(dossierStore.filter(dossier => dossier.advisorId === advisorId))
+}
+
+function canAccessDossierMessaging(dossier, requester) {
+  if (!dossier) return false
+  if (requester.role === 'admin') return true
+  if (requester.role === 'client') return dossier.userId === requester.id
+  if (requester.role === 'advisor') return !dossier.advisorId || dossier.advisorId === requester.id
+  return false
+}
+
+export function getDossierMessages(dossierId, requester) {
+  const dossier = dossierStore.find(item => item.id === dossierId)
+  if (!dossier) return Promise.reject(new Error('Dossier introuvable.'))
+  if (!canAccessDossierMessaging(dossier, requester)) {
+    return Promise.reject(new Error("Vous n'avez pas accès à la messagerie de ce dossier."))
+  }
+  const messages = messageStore
+    .filter(message => message.dossierId === dossierId)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+  return Promise.resolve(messages)
+}
+
+export function sendDossierMessage({ dossierId, sender, content }) {
+  const dossier = dossierStore.find(item => item.id === dossierId)
+  if (!dossier) return Promise.reject(new Error('Dossier introuvable.'))
+  if (!canAccessDossierMessaging(dossier, sender)) {
+    return Promise.reject(new Error("Vous n'avez pas le droit d'écrire sur ce dossier."))
+  }
+  const text = String(content || '').trim()
+  if (!text) return Promise.reject(new Error('Le message ne peut pas être vide.'))
+  const defaultName = sender.role === 'advisor' ? 'Conseiller' : sender.role === 'admin' ? 'Administration' : 'Client'
+  const message = {
+    id: `MSG-${Date.now()}`,
+    dossierId,
+    senderId: sender.id,
+    senderName: sender.name || defaultName,
+    senderRole: sender.role,
+    content: text,
+    date: new Date().toISOString(),
+  }
+  messageStore = [...messageStore, message]
+  persistMessages()
+  if (sender.role === 'client') {
+    if (dossier.advisorId) {
+      addNotification({ userId: dossier.advisorId, title: 'Nouveau message client', message: `Message pour le dossier ${dossierId}.` })
+    }
+  } else {
+    addNotification({ userId: dossier.userId, title: 'Réponse du conseiller', message: `Nouveau message sur le dossier ${dossierId}.` })
+  }
+  return Promise.resolve(message)
+}
+
+export function getDossierAdvisor(dossierId) {
+  const dossier = dossierStore.find(item => item.id === dossierId)
+  if (!dossier || !dossier.advisorId) return Promise.resolve(null)
+  const advisor = userStore.find(item => item.id === dossier.advisorId)
+  return Promise.resolve(advisor ? { id: advisor.id, name: advisor.name, role: advisor.role } : null)
 }
